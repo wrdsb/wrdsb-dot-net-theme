@@ -12,7 +12,7 @@ Both the .NET Theme and the Official WordPress Theme share common assets.
 ## Report issues
 
 Public comments and issues are welcome in the issue queue!
-* https://github.com/wrdsb/wrdsb-dot-net-template/issues
+* https://github.com/wrdsb/wrdsb-dot-net-theme/issues
 
 ## Documentation
 
@@ -22,4 +22,4 @@ in the Software Development Handbook.
 
 ## Code Climate
 
-[![Code Climate](https://codeclimate.com/github/wrdsb/wrdsb-dot-net-template/badges/gpa.svg)](https://codeclimate.com/github/wrdsb/wrdsb-dot-net-template)
+[![Code Climate](https://codeclimate.com/github/wrdsb/wrdsb-dot-net-theme/badges/gpa.svg)](https://codeclimate.com/github/wrdsb/wrdsb-dot-net-theme)
