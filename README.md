@@ -1,4 +1,4 @@
-dot-net-template
+dot-net-theme
 ===
 
 ## About This Software
