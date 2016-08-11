@@ -1,0 +1,27 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    @Html.Partial("_Header")
+
+    <title>WRDSB</title>
+
+</head>
+<body>
+    <div id="body">
+        <section class="content-wrapper main-content clearfix">
+            @RenderBody()
+        </section>
+    </div>
+    <footer>
+        <div class="content-wrapper">
+            <div>
+                @Html.Partial("_Footer")
+            </div>
+        </div>
+    </footer>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>
