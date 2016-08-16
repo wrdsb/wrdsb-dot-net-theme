@@ -7,17 +7,18 @@
 
   <title><%:ConfigurationManager.AppSettings["title"].ToString() %></title>
 
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-  <link href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/css/Site.css" rel="stylesheet">
+  <!-- Dot Net specific style just for the login page -->
+  <link href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/css/dotnetlogin.css" rel="stylesheet" />
      
   <!-- Bootstrap -->
-  <link href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/css/bootstrap.css" rel="stylesheet" media="all">
-  <link href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/css/bootstrap-theme.css" rel="stylesheet">
-  <link href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/css/style.css" rel="stylesheet">
-  <link href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/css/icon-styles.css" rel="stylesheet">
+  <link href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/css/bootstrap.css" rel="stylesheet" media="all"/>
+  <link href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/css/bootstrap-theme.css" rel="stylesheet"/>
+  <link href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/css/style.css" rel="stylesheet"/>
+  <link href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/css/icon-styles.css" rel="stylesheet"/>
 
   <link href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/images/icon-60x60.png" rel="apple-touch-icon" />
   <link href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/images/icon-76x76.png" rel="apple-touch-icon" sizes="76x76" />
@@ -30,227 +31,26 @@
   <!-- Include all compiled plugins (below), or include individual files as needed -->
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 
-  <!-- Add to Home Screen Button -->
-
-  <link href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/css/addtohomescreen.css" rel="stylesheet">
-  <script src="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/js/addtohomescreen.min.js"></script>
-  <script src="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/js/jquery/jquery.floatThead.min.js"></script>
-
-  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-  <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-  <![endif]-->
-
-  <script>
-      // addToHomescreen.removeSession();     // use this to remove the localStorage variable
-      var ath = addToHomescreen({
-          appID: 'ca.wrdsb',
-          message: 'To add this website to Home Screen: tap %icon and then <strong>Add to Home Screen</strong>',
-          //debug: 'ios',             // activate debug mode in ios emulation
-          skipFirstVisit: true,       // show at first access
-          //startDelay: 1,            // display the message right away
-          //lifespan: 15,             // do not automatically kill the call out
-          //displayPace: 0,           // do not obey the display pace
-          maxDisplayCount: 1          // do not obey the max display count
-      });
-      // ath.clearSession();      // reset the user session
-      $(document).ready(function () {
-          $('table.table-fixed-head').floatThead({
-              useAbsolutePositioning: false
-          });
-      });
-      $("table").addClass("table table-striped table-bordered");
-      $("table").wrap("<div class='table-responsive'></div>");
-  </script>
-
-  <script type='text/javascript' src='http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/js/jquery/jquery.js?ver=1.12.4'></script>
-  <script type='text/javascript' src='http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/js/jquery/jquery-migrate.min.js?ver=1.4.1'></script>
-
-  <!-- Favicon -->
-  <link rel="shortcut icon" type="image/png" href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/favicon.png" />
-
-  <!-- Google Analytics 
-  <script type="text/javascript">
-    var _gaq = _gaq || [];
-              _gaq.push(['_setAccount', 'UA-16094689-1']);
-                                _gaq.push(['_setDomainName', '.www.wrdsb.ca']);
-                    _gaq.push(['_setAllowHash', false]);
-                                    _gaq.push(['_trackPageview']);
-    
-            
-    (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-                        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-                    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    })();
-  </script>
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-      ga('create', 'UA-16094689-1', 'auto');
-      ga('send', 'pageview');
-  </script>
-  -->
         <asp:ContentPlaceHolder ID="head" runat="server">
     </asp:ContentPlaceHolder>
 </head>
 <body>
 
-<div class="container container-top">
-    <div class="header">
-      <div class="row">
-        <div class="col-md-9 col-sm-9">
-          <div id="logo">
-            <a href="<%:ConfigurationManager.AppSettings["appUrl"].ToString() %>"><span><%:ConfigurationManager.AppSettings["title"].ToString() %></span>
-              <h2><%:ConfigurationManager.AppSettings["title"].ToString() %></h2>
-              <h3><%:ConfigurationManager.AppSettings["tagline"].ToString() %></h3>
-            </a>
-          </div>
-        </div>
-        <div class="col-md-3 col-sm-3">
-          <div class="staff-shortcuts">
-            <div class="staff-shortcut-list">
-              <a href="#contact">Contact Information</a>
-            </div>
-            <!-- No need to search anything on the login page
-            <div class="searchbox">
-              <form action="http://www.wrdsb.ca/" method="get">
-                <fieldset>
-                  <input type="text" name="s" id="search" value="" placeholder="Search" />
-                </fieldset>
-              </form>
-            </div>-->
-          </div>
-        </div>
-      </div>
-    </div>
-    </div>
 
     <div class="login">
-	<p style="text-align:center;"><img src="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/images/wrdsb_login_logo.gif" alt="logo"></p>
-	<br>    
-    <h2>Single Sign On</h2>
-    <div id="userNamePasswordPrompt">
-        <p>
-            Please enter your user name and password.
-        </p>
-    </div>
-    
-    
-    <span class="failureNotification">
-        
-    </span>
-    <div id="LoginUserValidationSummary" class="failureNotification" style="display:none;">
-
-</div>
-    <div class="accountInfo">
-        <table border="0" cellpadding="2">
-            
-            <tbody><tr>
-                <td>
-                    <p>
-                        <label for="UserName" id="UserNameLabel">User name:</label>
-                    </p>
-                </td>
-                <td>
-                    <p>
-                        <input name="UserName" type="text" id="UserName" class="userName">
-                        <span id="UserNameRequired" title="User Name is required." class="failureNotification" style="visibility:hidden;">*</span>
-                    </p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <p>
-                        <label for="Password" id="PasswordLabel">Password:</label>
-                    </p>
-                </td>
-                <td>
-                    <p>
-                        <input name="Password" type="password" id="Password" class="password">
-                        <span id="PasswordRequired" title="Password is required." class="failureNotification" style="visibility:hidden;">*</span>
-                    </p>
-                </td>
-            </tr>
-            
-            
-            <tr>
-                <td align="right" colspan="2">
-                    <p class="submitButton">
-                        <input type="submit" name="LoginButton" value="Login" onclick="javascript:WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(&quot;LoginButton&quot;, &quot;&quot;, true, &quot;LoginUserValidationGroup&quot;, &quot;&quot;, false, false))" id="LoginButton" class="btn"/>
-                    </p>
-                </td>
-            </tr>
-            <tr>
-			<td align="right" colspan="2">
-			<p><a href="https://mypassword.wrdsb.ca/" target="_blank">Password Reset</a></p>
-			</td>
-			</tr>
-        </tbody></table>
-    </div>
-    
-    
+        <div id="logo">
+            <img src="https://s3.amazonaws.com/wrdsb-theme/images/WRDSB_Logo.svg" />
+        </div>
+        <h2>Log on</h2><!--Whats the text here: Google Apps Login, PAL Login, Login ??? Google apps might be different-->
+        <form runat="server">
+        <tbody>
+            <tr><td><p>Username</p><asp:TextBox ID="txtUsername" runat="server"></asp:TextBox></td></tr>
+            <tr><td><p>Password</p><asp:TextBox ID="TextBox1" runat="server"></asp:TextBox></td></tr><br />
+            <tr><td><asp:Button ID="btnLogin" runat="server" Text="Login" /></td></tr>
+            <tr><td><p><a href="https://mypassword.wrdsb.ca/" target="_blank">Password Reset</a></p></td></tr>
+         </tbody>
+        </form>
     </div>
 
-
-
-    <!-- start footer -->
-    <div class="footer" id="contact">
-    <div class="container">
-        <div class="row">
-        <div class="col-sm-6 col-md-3">
-            <!-- address -->
-            <address>
-            <h1>Waterloo Region District School Board</h1>
-        	<p>51 Ardelt Avenue<br />
-            Kitchener, ON N2C 2R5</p>
-
-            <p>Switchboard: 519-570-0003<br />
-            <a href="http://www.wrdsb.ca/about-the-wrdsb/contact/">Contact Information</a></p>
-
-            <p><a href="http://www.wrdsb.ca/about-the-wrdsb/contact/website-feedback/">Website Feedback Form</a></p>
-            </address>
-        </div>
-        <div class="col-sm-6 col-md-3">
-            <h1>Need Help?</h1>
-            <% if(ConfigurationManager.AppSettings["isInternal"] == "true") %>
-            <% { %>
-            <!-- for internal applications or administrative screens 
-            make sure you link to the direct link for a ticket -->
-            <p><a href="<%:ConfigurationManager.AppSettings["serviceDesk"].ToString() %>" target="_blank">Questions? Requests? ITService Desk!</a></p>
-            <% } %>
-
-            <% if(ConfigurationManager.AppSettings["isInternal"] == "false") %>
-            <% { %>
-            <!-- for public facing applications or where help doesn't come through ITService Desk -->
-            <p>Instructions on how to get help, e.g.: "Call your Child's School directly to do whatever you need to do.", or links to help pages in the application.</p>
-            <p>Person or Role Who Will Help<br />
-            <a href="mailto:help@wrdsb.on.ca">Email for Help</a><br />
-            Phone: 519-555-1212x0000</p>
-            <% } %>
-        </div>
-
-        <!-- for internal applications or administrative screens 
-        make sure you link to the direct link for a ticket -->
-        <% if(ConfigurationManager.AppSettings["isInternal"] == "true") %>
-        <% { %>
-        <div class="col-sm-6 col-md-3">
-            <h1>Application Information</h1>
-            <h2>Owner</h2>
-            <p><%:ConfigurationManager.AppSettings["owner"].ToString() %></p>
-            <h2>Developer</h2>
-            <p><%:ConfigurationManager.AppSettings["developer"].ToString() %></p>
-        </div>
-        <% } %>
-        <div class="col-sm-12 col-md-3">
-            <!--Space for more footer columns -->
-        </div>
-        </div>
-    </div>
-    </div>
 </body>
 </html>
