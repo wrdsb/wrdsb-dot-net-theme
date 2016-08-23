@@ -32,7 +32,7 @@ namespace DotNetThemeMVC
             //   appId: "",
             //   appSecret: "");
 
-            //app.UseGoogleAuthentication();
+            app.UseGoogleAuthentication();
         }
     }
 }

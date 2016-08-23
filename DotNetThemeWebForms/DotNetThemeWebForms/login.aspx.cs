@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DotNetThemeWebForms;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -12,6 +13,21 @@ namespace DotNetTheme
         protected void Page_Load(object sender, EventArgs e)
         {
 
+        }
+
+        protected void btnLogin_Click(object sender, EventArgs e)
+        {
+            String adPath = ""; //Fully-qualified Domain Name
+            LdapAuthentication adAuth = new LdapAuthentication(adPath);
+            try
+            {
+                if (true == adAuth.IsAuthenticated("ADMIN", txtUsername.Text, txtPassword.Text))
+                { }
+            }
+            catch(Exception ex)
+            {
+
+            }
         }
     }
 }
