@@ -20,7 +20,7 @@
     <label for="txtPassword">Password</label>
     <!--<input name="sdlfkjsdflsj$TextBox1" type="text" ID="TextBox1" />-->
     <asp:TextBox ID="txtPassword" runat="server" TextMode="Password"></asp:TextBox>
-    <!-- if an error: <p class="alert alert-danger" id="TextBox1Error" role="alert">$textbox1_errormessage</p> -->
+    <p class="alert alert-danger" role="alert" id="loginErrors" runat="server" style="visibility:hidden"></p>
 
     <!-- Submit Form -->
     <!--<input type="submit" name="..$btnLogin" ID="btnLogin" value="Log in" />-->

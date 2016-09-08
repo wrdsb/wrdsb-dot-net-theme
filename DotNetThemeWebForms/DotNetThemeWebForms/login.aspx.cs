@@ -26,7 +26,8 @@ namespace DotNetTheme
             }
             catch(Exception ex)
             {
-
+                loginErrors.InnerHtml = "Authentication did not succeed. Check user name and password.";
+                loginErrors.Style.Remove("visibility");
             }
         }
     }

@@ -281,6 +281,7 @@
             <h1>Application Information</h1>
             <h2>Owner</h2>
             <p><%:ConfigurationManager.AppSettings["owner"].ToString() %></p>
+            <p>Email: <a href="mailto:<%:ConfigurationManager.AppSettings["ownerEmail"].ToString() %>"><%:ConfigurationManager.AppSettings["ownerEmail"].ToString() %></a></p>
             <h2>Developer</h2>
             <p><%:ConfigurationManager.AppSettings["developer"].ToString() %></p>
         </div>
