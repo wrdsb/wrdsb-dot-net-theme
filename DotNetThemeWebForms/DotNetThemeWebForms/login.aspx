@@ -4,7 +4,7 @@
     <div id="logo">
         <img src="https://s3.amazonaws.com/wrdsb-theme/images/WRDSB_Logo.svg" />
     </div>
-    <h1>Log in to Site Name<!-- <%:ConfigurationManager.AppSettings["title"].ToString() %> --></h1>
+    <h1>Log in to <%:ConfigurationManager.AppSettings["loginTitle"].ToString() %></h1>
     <!--<p class="alert alert-danger" id="formError" role="alert">$form_errormessage</p>-->
     <!-- if an error: <p class="alert alert-danger" id="formError" role="alert">$form_errormessage</p> -->
 
