@@ -48,6 +48,7 @@
                 <h1>Application Information</h1>
                 <h2>Owner</h2>
                 <p>@System.Web.Configuration.WebConfigurationManager.AppSettings["owner"].ToString()</p>
+                <p>Email: <a href="@System.Web.Configuration.WebConfigurationManager.AppSettings["ownerEmail"].ToString()"></a></p>
                 <h2>Developer</h2>
                 <p>@System.Web.Configuration.WebConfigurationManager.AppSettings["developer"].ToString()</p>
             </div>
