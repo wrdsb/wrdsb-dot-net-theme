@@ -9,6 +9,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin.Security;
 using DotNetThemeMVC.Models;
+using System.Web.Security;
 
 namespace DotNetThemeMVC.Controllers
 {
@@ -43,6 +44,7 @@ namespace DotNetThemeMVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
         {
+            /* Default generated code
             if (ModelState.IsValid)
             {
                 var user = await UserManager.FindAsync(model.UserName, model.Password);
@@ -58,7 +60,34 @@ namespace DotNetThemeMVC.Controllers
             }
 
             // If we got this far, something failed, redisplay form
+            return View(model);*/
+
+            //This code is for AD Auth
+            var errors = ModelState.Values.SelectMany(v => v.Errors);
+            if (ModelState.IsValid)
+            {
+                if (Membership.ValidateUser(model.UserName, model.Password))
+                {
+                    FormsAuthentication.SetAuthCookie(model.UserName, model.RememberMe);
+                    if (Url.IsLocalUrl(returnUrl) && returnUrl.Length > 1 && returnUrl.StartsWith("/")
+                        && !returnUrl.StartsWith("//") && !returnUrl.StartsWith("/\\"))
+                    {
+                        return Redirect(returnUrl);
+                    }
+                    else
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError("", "The user name or password provided is incorrect");
+                }
+            }
+
+            // if we got this far, something failed, redisplay form
             return View(model);
+            //End of AD Auth
         }
 
         //
