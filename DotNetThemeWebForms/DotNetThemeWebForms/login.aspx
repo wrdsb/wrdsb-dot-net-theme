@@ -27,6 +27,7 @@
     <asp:Button ID="btnLogin" runat="server" Text="Login" OnClick="btnLogin_Click" />
     </fieldset>
     </form>
+    <!--<p><a href="redirect to registration page" target="_blank">Register for an Account</a></p>-->
     <p class="fineprint"><a href="https://mypassword.wrdsb.ca/" target="_blank">Password Reset</a></p>
 </div>
 </asp:Content>
