@@ -1,0 +1,12 @@
+﻿@model ModelStateDictionary
+<!-- Created an custom view to override the way validation summary is rendered -->
+@if (!Model.IsValid)
+{
+    <div class="alert alert-danger" role="alert">
+        @foreach (var modelError in
+                     Model.SelectMany(keyValuePair => keyValuePair.Value.Errors))
+        {
+            @modelError.ErrorMessage
+        }
+    </div>
+}

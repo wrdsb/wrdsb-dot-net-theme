@@ -76,7 +76,7 @@
   <!-- Google Analytics 
   <script type="text/javascript">
     var _gaq = _gaq || [];
-              _gaq.push(['_setAccount', 'UA-16094689-1']);
+              _gaq.push(['_setAccount', '<%:ConfigurationManager.AppSettings["googleAnalytics"].ToString() %>']);
                                 _gaq.push(['_setDomainName', '.www.wrdsb.ca']);
                     _gaq.push(['_setAllowHash', false]);
                                     _gaq.push(['_trackPageview']);
@@ -93,7 +93,7 @@
       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
       m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
       })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-      ga('create', 'UA-16094689-1', 'auto');
+      ga('create', '<%:ConfigurationManager.AppSettings["googleAnalytics"].ToString() %>', 'auto');
       ga('send', 'pageview');
   </script>
   -->

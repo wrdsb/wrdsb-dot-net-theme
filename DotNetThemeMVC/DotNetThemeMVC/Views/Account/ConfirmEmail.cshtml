@@ -1,0 +1,14 @@
+﻿@{
+    Layout = "~/Views/Shared/_LoginTheme.cshtml";
+    ViewBag.Title = "Confirm Email";
+}
+<div class="login">
+    <div id="logo">
+        <img src="https://s3.amazonaws.com/wrdsb-theme/images/WRDSB_Logo.svg" />
+    </div>
+    <div>
+        <p>
+            Thank you for confirming your email. Please @Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" }) now to register your child(ren).
+        </p>
+    </div>
+</div>

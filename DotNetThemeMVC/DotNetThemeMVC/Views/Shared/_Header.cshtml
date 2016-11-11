@@ -5,27 +5,30 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <!-- Bootstrap -->
-<link href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/css/bootstrap.css" rel="stylesheet" media="all">
-<link href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/css/bootstrap-theme.css" rel="stylesheet">
-<link href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/css/style.css" rel="stylesheet">
-<link href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/css/icon-styles.css" rel="stylesheet">
+<link href="https://s3.amazonaws.com/wrdsb-theme/css/bootstrap.css" rel="stylesheet" media="all">
+<link href="https://s3.amazonaws.com/wrdsb-theme/css/bootstrap-theme.css" rel="stylesheet">
+<link href="https://s3.amazonaws.com/wrdsb-theme/css/style.css" rel="stylesheet">
+<link href="https://s3.amazonaws.com/wrdsb-theme/css/icon-styles.css" rel="stylesheet">
 
-<link href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/images/icon-60x60.png" rel="apple-touch-icon" />
-<link href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/images/icon-76x76.png" rel="apple-touch-icon" sizes="76x76" />
-<link href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/images/icon-120x120.png" rel="apple-touch-icon" sizes="120x120" />
-<link href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/images/icon-152x152.png" rel="apple-touch-icon" sizes="152x152" />
+<link href="https://s3.amazonaws.com/wrdsb-theme/images/icon-60x60.png" rel="apple-touch-icon" />
+<link href="https://s3.amazonaws.com/wrdsb-theme/images/icon-76x76.png" rel="apple-touch-icon" sizes="76x76" />
+<link href="https://s3.amazonaws.com/wrdsb-theme/images/icon-120x120.png" rel="apple-touch-icon" sizes="120x120" />
+<link href="https://s3.amazonaws.com/wrdsb-theme/images/icon-152x152.png" rel="apple-touch-icon" sizes="152x152" />
 
 
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+        integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
+        crossorigin="anonymous"></script>
 <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 
 <!-- Add to Home Screen Button -->
 
-<link href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/css/addtohomescreen.css" rel="stylesheet">
-<script src="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/js/addtohomescreen.min.js"></script>
-<script src="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/js/jquery/jquery.floatThead.min.js"></script>
+<link href="https://s3.amazonaws.com/wrdsb-theme/css/addtohomescreen.css" rel="stylesheet">
+<script src="https://s3.amazonaws.com/wrdsb-theme/js/addtohomescreen.min.js"></script>
+<script src="https://s3.amazonaws.com/wrdsb-theme/js/jquery/jquery.floatThead.min.js"></script>
 
 <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -56,16 +59,16 @@
     $("table").wrap("<div class='table-responsive'></div>");
 </script>
 
-<script type='text/javascript' src='http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/js/jquery/jquery.js?ver=1.12.4'></script>
-<script type='text/javascript' src='http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/js/jquery/jquery-migrate.min.js?ver=1.4.1'></script>
+<script type='text/javascript' src='https://s3.amazonaws.com/wrdsb-theme/js/jquery/jquery.js?ver=1.12.4'></script>
+<script type='text/javascript' src='https://s3.amazonaws.com/wrdsb-theme/js/jquery/jquery-migrate.min.js?ver=1.4.1'></script>
 
 <!-- Favicon -->
-<link rel="shortcut icon" type="image/png" href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/favicon.png" />
+<link rel="shortcut icon" type="image/png" href="https://s3.amazonaws.com/wrdsb-theme/favicon.png" />
 
 <!-- Google Analytics
 <script type="text/javascript">
   var _gaq = _gaq || [];
-            _gaq.push(['_setAccount', 'UA-16094689-1']);
+            _gaq.push(['_setAccount', '@System.Web.Configuration.WebConfigurationManager.AppSettings["googleAnalytics"].ToString()']);
                               _gaq.push(['_setDomainName', '.www.wrdsb.ca']);
                   _gaq.push(['_setAllowHash', false]);
                                   _gaq.push(['_trackPageview']);
@@ -82,7 +85,7 @@
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
     m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
     })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-    ga('create', 'UA-16094689-1', 'auto');
+    ga('create', '@System.Web.Configuration.WebConfigurationManager.AppSettings["googleAnalytics"].ToString()', 'auto');
     ga('send', 'pageview');
 </script>
 -->
@@ -94,8 +97,8 @@
                 <div id="logo">
                     <a href="@System.Web.Configuration.WebConfigurationManager.AppSettings["appurl"].ToString()"</a>
                     <span>@System.Web.Configuration.WebConfigurationManager.AppSettings["title"].ToString()</span>
-                        <h2>@System.Web.Configuration.WebConfigurationManager.AppSettings["title"].ToString()</h2>
-                        <h3>@System.Web.Configuration.WebConfigurationManager.AppSettings["tagline"].ToString()</h3>
+                    <h2>@System.Web.Configuration.WebConfigurationManager.AppSettings["title"].ToString()</h2>
+                    <h3>@System.Web.Configuration.WebConfigurationManager.AppSettings["tagline"].ToString()</h3>
                     </a>
                 </div>
             </div>
@@ -139,20 +142,16 @@
 
         <div class="collapse navbar-collapse">
             <ul id="menu-top-menu" class="nav nav-justified">
-                <li runat="server" id="home_link" class="menu-item current-menu-item current_page_item menu-item-home"><a title="Take me to the home page" href="Default.aspx">Home</a></li>
-                <li id="Subpage1" class="menu-item menu-item-type-post_type menu-item-object-page"><a title="Take me to the test1 page" href="Subpage1.aspx">Subpage1</a></li>
-                <li id="Subpage2" class="menu-item menu-item-type-post_type menu-item-object-page"><a title="Take me to the test2 page" href="Subpage2.aspx">Subpage2</a></li>
-                <!-- More menus
-                <li id="<? menu_link_id ??>" class="menu-item menu-item-type-post_type menu-item-object-page"><a title="<? optional description ??>" href="<? application home url ??>">Page Title</a></li>
-                <li id="<? menu_link_id ??>" class="menu-item menu-item-type-post_type menu-item-object-page"><a title="<? optional description ??>" href="<? application home url ??>">Page Title</a></li>
-                <li id="<? menu_link_id ??>" class="menu-item menu-item-type-post_type menu-item-object-page"><a title="<? optional description ??>" href="<? application home url ??>">Page Title</a></li>
-                <li id="<? menu_link_id ??>" class="menu-item menu-item-type-post_type menu-item-object-page"><a title="<? optional description ??>" href="<? application home url ??>">Page Title</a></li>
-                    -->
+                <li id="home_link" class="menu-item current-menu-item current_page_item menu-item-home"><a title="Take me to the home page" href="Default.aspx">Home</a></li>
+                @if (User.IsInRole("Administrators"))
+                {
+                    <li id="admin_link" class="menu-item menu-item-type-post_type menu-item-object-page"><a title="Take me to the admin page" href="@Url.Action("Index", "Administrator")">Administrators</a></li>
+                }
+                else
+                {
+                    <li id="form_link" class="menu-item menu-item-type-post_type menu-item-object-page"><a title="Take me to the forms page" href="@Url.Action("Index", "Form")">Registration Form</a></li>
+                }
             </ul>
         </div>
     </div><!-- /.navbar -->
 </div>
-
-<!-- breadcrumbs -->
-<!--<div class="container container-breadcrumb"><ol class="breadcrumb"><li><a href="/">Home</a></li><li>Current Page Title</li></ol></div>-->
-<!-- .net site map equivalent...is controller based-->

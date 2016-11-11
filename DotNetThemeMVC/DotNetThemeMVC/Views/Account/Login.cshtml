@@ -1,5 +1,5 @@
-﻿@model DotNetThemeMVC.Models.LoginViewModel
-
+﻿@using DotNetThemeMVC.Models
+@model LoginViewModel
 @{
     Layout = "~/Views/Shared/_LoginTheme.cshtml";
     ViewBag.Title = "Log in";
@@ -7,39 +7,33 @@
 
 <div class="login">
 
-            @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
-            {
-                @Html.AntiForgeryToken()
+    @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        @Html.AntiForgeryToken()
 
-                @Html.ValidationSummary(true)
+        <div id="logo">
+            <img src="https://s3.amazonaws.com/wrdsb-theme/images/WRDSB_Logo.svg" />
+        </div>
+        <h1>Log in to @System.Web.Configuration.WebConfigurationManager.AppSettings["loginTitle"].ToString()</h1>
+        <form id="loginform">
+            <fieldset>
+                <!-- Username -->
+                @Html.LabelFor(m => m.Email)
+                @Html.TextBoxFor(m => m.Email)
+                @Html.ValidationMessageFor(m => m.Email)
 
-                    <div id="logo">
-                        <img src="https://s3.amazonaws.com/wrdsb-theme/images/WRDSB_Logo.svg" />
-                    </div>
-                    <h1>Log in to @System.Web.Configuration.WebConfigurationManager.AppSettings["loginTitle"].ToString()</h1>
-                    <form id="loginform">
-                        <fieldset>
-                            <!-- Username -->
-                            @Html.LabelFor(m => m.UserName)
-                            @Html.TextBoxFor(m => m.UserName)
-                            @Html.ValidationMessageFor(m => m.UserName)
-
-                            <!-- Password -->
-                            @Html.LabelFor(m => m.Password)
-                            @Html.PasswordFor(m => m.Password)
-                            @Html.ValidationMessageFor(m => m.Password)
-                            <!-- if an error: <p class="alert alert-danger" id="TextBox1Error" role="alert">$textbox1_errormessage</p> -->
-                            <!-- Submit Form -->
-                            <input type="submit" name="btnLogin" id="btnLogin" value="Log in" />
-                        </fieldset>
-                    </form>
-                    <p>
-                        @Html.ActionLink("Register for an Account", "Register")
-                    </p>
-                    <p class="fineprint"><a href="https://mypassword.wrdsb.ca/" target="_blank">Password Reset</a></p>
-
-            }
+                <!-- Password -->
+                @Html.LabelFor(m => m.Password)
+                @Html.PasswordFor(m => m.Password)
+                @Html.ValidationMessageFor(m => m.Password)
+                @Html.Partial("_ValidationSummary", ViewData.ModelState)
+                <!-- Submit Form -->
+                <input type="submit" name="btnLogin" id="btnLogin" value="Log in" />
+            </fieldset>
+        </form>
+        <p>
+            @Html.ActionLink("Register for an Account", "Register")
+        </p>
+        <p> @Html.ActionLink("Forgot your password?", "ForgotPassword")</p>
+    }
 </div>
-
-
-
