@@ -7,17 +7,11 @@
 
 </head>
 <body>
-    <div id="body">
-        <section class="content-wrapper main-content clearfix">
-            @RenderBody()
-        </section>
+    <div class="container">
+        @RenderBody()
     </div>
-    <footer>
-        <div class="content-wrapper">
-            <div>
-                @Html.Partial("_Footer")
-            </div>
-        </div>
-    </footer>
+    @Html.Partial("_Footer")
 </body>
+
 </html>
+@RenderSection("scripts", required: false)
