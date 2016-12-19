@@ -20,9 +20,32 @@ namespace DotNetThemeMVC
     {
         public async Task SendAsync(IdentityMessage message)
         {
+            //Store the passed in body text
+            string bodyText = message.Body;
+
+            //Configure the email template
+            //Subsitute new email text to the identity message message
+            string emailTemplate = "<div id='email' style='display: block;'>" +
+                                    "<div id='logo' style='display: block;margin-top: 14px;'>" +
+                                    "<a href='https://www.wrdsb.ca' style='height: 150px;display: inline-block;width: 100%;background: url(https://s3.amazonaws.com/wrdsb-ui-assets/0/0.10.4/images/wrdsb_logo_medallion.gif) no-repeat;background-size: 150 136;padding-left: 160px;text-decoration: none;color: #000;'>" +
+                                    "<h1 style='font-size: 30px;font-weight: bold;margin: 0;top: 58px;position: absolute;color: #005daa;'>" + @System.Web.Configuration.WebConfigurationManager.AppSettings["loginTitle"].ToString() + "</h1>" +
+                                    "</a>" +
+                                    "</div>" +
+                                    "<div id='greenbar' style='background-color:#7ac143; height:6px;'></div>" +
+                                    "<br />" +
+                                    "<div id='body' style='display: block;'>" +
+                                    bodyText +
+                                    "</div>" +
+                                    "<div id='legal' style='display: block;'>" +
+                                    "<p style='font-size: 12px;line-height: 130%;'>" +
+                                    "Confidentiality Warning: ~This message and any attachments are intended only for the use of the intended recipient(s) and may contain confidential or personal information that may be subject to the provisions of the Municipal Freedom of Information and Protection of Privacy Act. ~If you are not the intended recipient or an authorized representative of the intended recipient, you are notified that any dissemination of this communication is strictly prohibited.~ If you have received this communication in error, please notify the sender immediately and delete the message and any attachments." +
+                                    "</p></div></div>";
+
+            message.Body = emailTemplate;
+
             // convert IdentityMessage to a MailMessage
             var email =
-               new MailMessage(new MailAddress("noreply@wrdsb.ca", "(do not reply)"),
+               new MailMessage(new MailAddress("noreply@wrdsb.ca", "WRDSB (do not reply)"),
                new MailAddress(message.Destination))
                {
                    Subject = message.Subject,

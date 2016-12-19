@@ -73,28 +73,34 @@ namespace DotNetThemeMVC.Controllers
             }
         }
 
-        public bool CheckAdministrators(string username)
-        {
-            //Create a table in a sql db that has id{uniqueidentifier}, username {nvarchar(50)}. Allow nulls.
-            //Create an ADO.Net model linked to that table, below instatiates it. Yours will be named differently.
-            //wrdsb_fi_registrationEntities2 db = new wrdsb_fi_registrationEntities2();
+        /// <summary>
+        /// Compares authentication administrator against a control table of access granted administrators.
+        /// </summary>
+        /// <param name="username">The PAL username to verify</param>
+        /// <returns>boolean</returns>
+        //public bool CheckAdministrators(string username)
+        //{
+        //    administratorEntities db = new administratorEntities();
+        //    var adminList = db.administrators.ToList();
 
-            //Uncomment to enable checking.
-            //var adminList = db.administrators.ToList();
+        //    foreach (administrators admin in adminList)
+        //    {
+        //        if (admin.username.Equals(username))
+        //        {
+        //            return true;
+        //        }
+        //    }
 
-            //foreach (administrators admin in adminList)
-            //{
-            //    if (admin.username.Equals(username))
-            //    {
-            //        return true;
-            //    }
-            //}
+        //    return false;
+        //}
 
-            return false;
-        }
-
-        //
         // POST: /Account/Login
+        /// <summary>
+        /// Authenticates the user against the db.
+        /// </summary>
+        /// <param name="model">The login object</param>
+        /// <param name="returnUrl">the destination after login</param>
+        /// <returns>View</returns>
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -113,33 +119,40 @@ namespace DotNetThemeMVC.Controllers
                 if (AuthenticateAD(model.Email, model.Password))
                 {
                     //Compare authenticated username against control administrator table
-                    //Needs confirguration, see CheckAdministrators function for details
-                    //Uncomment to enable
+                    //This requires configuration. Create a control table in a SQL DB.
+                    /* CREATE TABLE [dbo].[administrators](
+	                    [id] [uniqueidentifier] NOT NULL,
+	                    [username] [nvarchar](50) NOT NULL,
+                        CONSTRAINT [PK_administrators] PRIMARY KEY CLUSTERED 
+                        (
+	                        [id] ASC
+                            )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+                        ) ON [PRIMARY]
+                     */
+                    //When creating an ADO.Net model of the new table name it: administratorEntities
                     //if (CheckAdministrators(model.Email))
                     //{
                         //Check to see if a local account exists, if not create one. Set confirmedemail to true. Set Role to Administrators.
-                        if (UserManager.FindByName(model.Email) == null)
-                        {
-                            var user = new ApplicationUser { UserName = model.Email, Email = model.Email, EmailConfirmed = true };
-                            var result = await UserManager.CreateAsync(user, model.Password);
+                        //if (UserManager.FindByName(model.Email) == null)
+                        //{
+                        //    var user = new ApplicationUser { UserName = model.Email, Email = model.Email, EmailConfirmed = true };
+                        //    var result = await UserManager.CreateAsync(user, model.Password);
 
-                            //Check to see if the Administrator role exists, if not create one.
-                            var roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(new ApplicationDbContext()));
-                            if (roleManager.RoleExists("Administrators"))
-                            {
-                                var role = new Microsoft.AspNet.Identity.EntityFramework.IdentityRole();
-                                role.Name = "Administrators";
-                                roleManager.Create(role);
-                            }
-
-                            UserManager.AddToRole(user.Id, "Administrators");
-                        }
-                    //Uncomment to enable CheckAdministrators()
+                        //    //Check to see if the Administrator role exists, if not create one.
+                        //    var roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(new ApplicationDbContext()));
+                        //    if (roleManager.RoleExists("Administrators"))
+                        //    {
+                        //        var role = new Microsoft.AspNet.Identity.EntityFramework.IdentityRole();
+                        //        role.Name = "Administrators";
+                        //        roleManager.Create(role);
+                        //    }
+                        //    UserManager.AddToRole(user.Id, "Administrators");
+                        //}
                     //}
                     //else
                     //{
-                    //    ModelState.AddModelError("", "Not an authorized user.");
-                    //    return View(model);
+                        //ModelState.AddModelError(string.Empty, "Not an authorized user.");
+                        //return View(model);
                     //}
                 }
                 else
@@ -149,9 +162,12 @@ namespace DotNetThemeMVC.Controllers
                 }
             }
 
+            //Normal user login and routing
             var userid = UserManager.FindByEmail(model.Email).Id;
             if (!UserManager.IsEmailConfirmed(userid))
             {
+                //Resend the code
+                string callbackUrl = await SendEmailConfirmationTokenAsync(userid, "Confirm your account-Resend");
                 return View("EmailNotConfirmed");
             }
             else
@@ -160,6 +176,11 @@ namespace DotNetThemeMVC.Controllers
                 switch (result)
                 {
                     case SignInStatus.Success:
+                        //If signed in user is administrator take them to the administrator home page
+                        if (UserManager.IsInRole(userid, "Administrators"))
+                        {
+                            return RedirectToAction("Home", "Administrator");
+                        }
                         return RedirectToLocal(returnUrl);
                     case SignInStatus.LockedOut:
                         return View("Lockout");
@@ -171,6 +192,23 @@ namespace DotNetThemeMVC.Controllers
                         return View(model);
                 }
             }
+        }
+
+        /// <summary>
+        /// Resends a confirmation code to the email the user provided
+        /// </summary>
+        /// <param name="userID"></param>
+        /// <param name="subject"></param>
+        /// <returns></returns>
+        private async Task<string> SendEmailConfirmationTokenAsync(string userID, string subject)
+        {
+            string code = await UserManager.GenerateEmailConfirmationTokenAsync(userID);
+            var callbackUrl = Url.Action("ConfirmEmail", "Account",
+               new { userId = userID, code = code }, protocol: Request.Url.Scheme);
+            await UserManager.SendEmailAsync(userID, subject,
+               "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+
+            return callbackUrl;
         }
 
         //
