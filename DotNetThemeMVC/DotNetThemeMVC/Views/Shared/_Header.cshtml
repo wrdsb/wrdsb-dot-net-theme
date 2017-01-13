@@ -103,18 +103,21 @@
                 </div>
             </div>
             <div class="col-md-3 col-sm-3">
+                <div class="login-detail">
+                    Logged in as: <b>@User.Identity.Name</b> @Html.ActionLink("Log off", "LogOff", "Account")
+                </div>
                 <div class="staff-shortcuts">
                     <div class="staff-shortcut-list">
-                        <a href="#contact">Contact Information</a>
+                        <a href="#contact">Contact Information</a><br />
                     </div>
                     <!-- Uncomment to enable searching
-                    <div class="searchbox">
-                      <form action="http://www.wrdsb.ca/" method="get">
-                        <fieldset>
-                          <input type="text" name="s" id="search" value="" placeholder="Search" />
-                        </fieldset>
-                      </form>
-                    </div>-->
+                <div class="searchbox">
+                  <form action="http://www.wrdsb.ca/" method="get">
+                    <fieldset>
+                      <input type="text" name="s" id="search" value="" placeholder="Search" />
+                    </fieldset>
+                  </form>
+                </div>-->
                 </div>
             </div>
         </div>

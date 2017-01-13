@@ -14,7 +14,15 @@
         <div id="logo">
             <img src="https://s3.amazonaws.com/wrdsb-theme/images/WRDSB_Logo.svg" />
         </div>
-        <h1>Log in to @System.Web.Configuration.WebConfigurationManager.AppSettings["loginTitle"].ToString()</h1>
+        <h1>@System.Web.Configuration.WebConfigurationManager.AppSettings["loginTitle"].ToString()</h1>
+
+        <div class="alert alert-info">
+            <p>
+                New to @System.Web.Configuration.WebConfigurationManager.AppSettings["loginTitle"].ToString()?<br>
+                @Html.ActionLink("Create an Account", "Register")
+            </p>
+        </div>
+
         <form id="loginform">
             <fieldset>
                 <!-- Username -->
@@ -25,15 +33,12 @@
                 <!-- Password -->
                 @Html.LabelFor(m => m.Password)
                 @Html.PasswordFor(m => m.Password)
+                <p> @Html.ActionLink("Forgot your password?", "ForgotPassword")</p>
                 @Html.ValidationMessageFor(m => m.Password)
                 @Html.Partial("_ValidationSummary", ViewData.ModelState)
                 <!-- Submit Form -->
                 <input type="submit" name="btnLogin" id="btnLogin" value="Log in" />
             </fieldset>
         </form>
-        <p>
-            @Html.ActionLink("Register for an Account", "Register")
-        </p>
-        <p> @Html.ActionLink("Forgot your password?", "ForgotPassword")</p>
     }
 </div>

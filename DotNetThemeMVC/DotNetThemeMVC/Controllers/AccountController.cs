@@ -110,28 +110,29 @@ namespace DotNetThemeMVC.Controllers
             {
                 return View(model);
             }
-
-            // This doesn't count login failures towards account lockout
-            // To enable password failures to trigger account lockout, change to shouldLockout: true
-            if (!model.Email.Contains("@"))
+            try
             {
-                //Authenticate against AD and then assign local accounts
-                if (AuthenticateAD(model.Email, model.Password))
+                // This doesn't count login failures towards account lockout
+                // To enable password failures to trigger account lockout, change to shouldLockout: true
+                if (!model.Email.Contains("@"))
                 {
-                    //Compare authenticated username against control administrator table
-                    //This requires configuration. Create a control table in a SQL DB.
-                    /* CREATE TABLE [dbo].[administrators](
-	                    [id] [uniqueidentifier] NOT NULL,
-	                    [username] [nvarchar](50) NOT NULL,
-                        CONSTRAINT [PK_administrators] PRIMARY KEY CLUSTERED 
-                        (
-	                        [id] ASC
-                            )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-                        ) ON [PRIMARY]
-                     */
-                    //When creating an ADO.Net model of the new table name it: administratorEntities
-                    //if (CheckAdministrators(model.Email))
-                    //{
+                    //Authenticate against AD and then assign local accounts
+                    if (AuthenticateAD(model.Email, model.Password))
+                    {
+                        //Compare authenticated username against control administrator table
+                        //This requires configuration. Create a control table in a SQL DB.
+                        /* CREATE TABLE [dbo].[administrators](
+                            [id] [uniqueidentifier] NOT NULL,
+                            [username] [nvarchar](50) NOT NULL,
+                            CONSTRAINT [PK_administrators] PRIMARY KEY CLUSTERED 
+                            (
+                                [id] ASC
+                                )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+                            ) ON [PRIMARY]
+                         */
+                        //When creating an ADO.Net model of the new table name it: administratorEntities
+                        //if (CheckAdministrators(model.Email))
+                        //{
                         //Check to see if a local account exists, if not create one. Set confirmedemail to true. Set Role to Administrators.
                         //if (UserManager.FindByName(model.Email) == null)
                         //{
@@ -148,49 +149,64 @@ namespace DotNetThemeMVC.Controllers
                         //    }
                         //    UserManager.AddToRole(user.Id, "Administrators");
                         //}
-                    //}
-                    //else
-                    //{
+                        //}
+                        //else
+                        //{
                         //ModelState.AddModelError(string.Empty, "Not an authorized user.");
                         //return View(model);
-                    //}
+                        //}
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", "Login failed.");
+                        return View(model);
+                    }
+                }
+
+                //Normal user login and routing
+                var userid = UserManager.FindByEmail(model.Email).Id;
+                if (!UserManager.IsEmailConfirmed(userid))
+                {
+                    //Resend the code
+                    string callbackUrl = await SendEmailConfirmationTokenAsync(userid, "Confirm your $ApplicationName account : WRDSB");
+                    return View("EmailNotConfirmed");
                 }
                 else
                 {
-                    ModelState.AddModelError("", "Login failed.");
-                    return View(model);
+                    var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
+                    switch (result)
+                    {
+                        case SignInStatus.Success:
+                            //If signed in user is administrator take them to the administrator home page unless they were linked to something specific
+                            if (UserManager.IsInRole(userid, "Administrators"))
+                            {
+                                if (Url.IsLocalUrl(returnUrl))
+                                {
+                                    return Redirect(returnUrl);
+                                }
+                                else
+                                {
+                                    return RedirectToAction("Home", "Administrator");
+                                }
+                            }
+                            return RedirectToLocal(returnUrl);
+                        case SignInStatus.LockedOut:
+                            return View("Lockout");
+                        case SignInStatus.RequiresVerification:
+                            return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
+                        case SignInStatus.Failure:
+                        default:
+                            ModelState.AddModelError("", "Log in failed.");
+                            return View(model);
+                    }
                 }
             }
-
-            //Normal user login and routing
-            var userid = UserManager.FindByEmail(model.Email).Id;
-            if (!UserManager.IsEmailConfirmed(userid))
+            catch (Exception ex)
             {
-                //Resend the code
-                string callbackUrl = await SendEmailConfirmationTokenAsync(userid, "Confirm your $ApplicationName account : WRDSB");
-                return View("EmailNotConfirmed");
-            }
-            else
-            {
-                var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
-                switch (result)
-                {
-                    case SignInStatus.Success:
-                        //If signed in user is administrator take them to the administrator home page
-                        if (UserManager.IsInRole(userid, "Administrators"))
-                        {
-                            return RedirectToAction("Home", "Administrator");
-                        }
-                        return RedirectToLocal(returnUrl);
-                    case SignInStatus.LockedOut:
-                        return View("Lockout");
-                    case SignInStatus.RequiresVerification:
-                        return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
-                    case SignInStatus.Failure:
-                    default:
-                        ModelState.AddModelError("", "Invalid login attempt.");
-                        return View(model);
-                }
+                Error error = new Error();
+                error.handleError(ex, "Exception occured during Login.");
+                ModelState.AddModelError(string.Empty, "There was a problem when attempting to sign you in. We are aware of the issue and will investigate. Please try signing in again. If the issue continues contact fi_feedback@wrdsb.on.ca");
+                return View(model);
             }
         }
 

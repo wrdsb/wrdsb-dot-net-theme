@@ -31,11 +31,11 @@
                 @if (@System.Web.Configuration.WebConfigurationManager.AppSettings["isInternal"] == "false")
                 {
                 <!-- for public facing applications or where help doesn't come through ITService Desk -->
-                    <p>Instructions on how to get help, e.g.: "Call your Child's School directly to do whatever you need to do.", or links to help pages in the application.</p>
+                    <p>For comments, questions, or problems regarding @System.Web.Configuration.WebConfigurationManager.AppSettings["loginTitle"].ToString() contact us by calling or emailing us with a detailed description of your inquery.</p>
                     <p>
-                        Person or Role Who Will Help<br />
-                        <a href="mailto:help@wrdsb.on.ca">Email for Help</a><br />
-                        Phone: 519-555-1212x0000
+                        @System.Web.Configuration.WebConfigurationManager.AppSettings["owner"].ToString()<br />
+                        Email: <a href="@System.Web.Configuration.WebConfigurationManager.AppSettings["ownerEmail"].ToString()">Contact Us</a><br />
+                        Phone: @System.Web.Configuration.WebConfigurationManager.AppSettings["phone"].ToString()
                     </p>
                 }
             </div>
@@ -48,7 +48,7 @@
                     <h1>Application Information</h1>
                     <h2>Owner</h2>
                     <p>@System.Web.Configuration.WebConfigurationManager.AppSettings["owner"].ToString()</p>
-                    <p>Email: <a href="@System.Web.Configuration.WebConfigurationManager.AppSettings["ownerEmail"].ToString()"></a></p>
+                    <p>Email: <a href="@System.Web.Configuration.WebConfigurationManager.AppSettings["ownerEmail"].ToString()">Contact Us</a></p>
                     <h2>Developer</h2>
                     <p>@System.Web.Configuration.WebConfigurationManager.AppSettings["developer"].ToString()</p>
                 </div>
