@@ -201,6 +201,13 @@ namespace DotNetThemeMVC.Controllers
                     }
                 }
             }
+            catch (NullReferenceException e)
+            {
+                //When an account doesnt exist the code: var userid = UserManager.FindByEmail(model.Email).Id; returns null
+                //Handle the errpr by redirecting to log in page, do not log this error to a db or emailing the developers
+                ModelState.AddModelError(string.Empty, "There was a problem when attempting to sign you in. We are aware of the issue and will investigate. Please try signing in again. If the issue continues contact fi_feedback@wrdsb.on.ca");
+                return View(model);
+            }
             catch (Exception ex)
             {
                 Error error = new Error();
