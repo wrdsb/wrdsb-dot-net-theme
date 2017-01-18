@@ -168,7 +168,7 @@ namespace DotNetThemeMVC.Controllers
                 if (!UserManager.IsEmailConfirmed(userid))
                 {
                     //Resend the code
-                    string callbackUrl = await SendEmailConfirmationTokenAsync(userid, "Confirm your $ApplicationName account : WRDSB");
+                    string callbackUrl = await SendEmailConfirmationTokenAsync(userid, "Confirm your " + System.Web.Configuration.WebConfigurationManager.AppSettings["title"].ToString() + " account : WRDSB");
                     return View("EmailNotConfirmed");
                 }
                 else
@@ -260,12 +260,12 @@ namespace DotNetThemeMVC.Controllers
 
                     string emailText = "<p style=\"font-size:2em;padding-top:1em;padding-bottom:1em;padding-right:1em;padding-left:1em;line-height:150%;text-align:center;background-color:#7ac143 ;margin-top:auto;margin-bottom:auto;margin-right:auto;margin-left:auto;\" >" +
                         "<a href=\"" + callbackUrl + "\" style=\"color:#fff;padding-top:1.3em;padding-bottom:1.3em;padding-right:1.3em;padding-left:1.3em;font-weight:bold;text-decoration:none;\" >Confirm my email address</a></p><br />" +
-                        "Thank you for registering for $Application Name. In order to proceed please <a href=\"" + callbackUrl + "\">confirm</a> your account. " +
+                        "Thank you for registering for " + System.Web.Configuration.WebConfigurationManager.AppSettings["title"].ToString() + ". In order to proceed please <a href=\"" + callbackUrl + "\">confirm</a> your account. " +
                         "If the link doesn't work copy and paste this link into your browser: " + callbackUrl + "<br />" +
                         "<h2>Next Steps</h2><br />" +
                         "Log in and complete the registration form for your child(ren).";
 
-                    await UserManager.SendEmailAsync(user.Id, "Confirm your WRDSB $ApplicationName account : WRDSB",
+                    await UserManager.SendEmailAsync(user.Id, "Confirm your WRDSB " + System.Web.Configuration.WebConfigurationManager.AppSettings["title"].ToString() + " account : WRDSB",
                         emailText);
 
                     return View("EmailNotConfirmed");
