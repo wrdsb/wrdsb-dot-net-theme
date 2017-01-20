@@ -16,7 +16,7 @@
         </div>
         <h1>@System.Web.Configuration.WebConfigurationManager.AppSettings["loginTitle"].ToString()</h1>
 
-        @if (@System.Web.Configuration.WebConfigurationManager.AppSettings["isInternal"] == "false")
+        if (System.Web.Configuration.WebConfigurationManager.AppSettings["isInternal"] == "false")
         {
         <div class="alert alert-info">
             <p>
