@@ -205,14 +205,14 @@ namespace DotNetThemeMVC.Controllers
             {
                 //When an account doesnt exist the code: var userid = UserManager.FindByEmail(model.Email).Id; returns null
                 //Handle the errpr by redirecting to log in page, do not log this error to a db or emailing the developers
-                ModelState.AddModelError(string.Empty, "There was a problem when attempting to sign you in. We are aware of the issue and will investigate. Please try signing in again. If the issue continues contact fi_feedback@wrdsb.on.ca");
+                ModelState.AddModelError(string.Empty, "There was a problem when attempting to sign you in. We are aware of the issue and will investigate. Please try signing in again. If the issue continues contact " + System.Web.Configuration.WebConfigurationManager.AppSettings["feedbackEmail"].ToString());
                 return View(model);
             }
             catch (Exception ex)
             {
                 Error error = new Error();
                 error.handleError(ex, "Exception occured during Login.");
-                ModelState.AddModelError(string.Empty, "There was a problem when attempting to sign you in. We are aware of the issue and will investigate. Please try signing in again. If the issue continues contact fi_feedback@wrdsb.on.ca");
+                ModelState.AddModelError(string.Empty, "There was a problem when attempting to sign you in. We are aware of the issue and will investigate. Please try signing in again. If the issue continues contact " + System.Web.Configuration.WebConfigurationManager.AppSettings["feedbackEmail"].ToString());
                 return View(model);
             }
         }
@@ -249,32 +249,42 @@ namespace DotNetThemeMVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
-                var result = await UserManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
+                if (ModelState.IsValid)
                 {
-                    string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                    var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                    var result = await UserManager.CreateAsync(user, model.Password);
+                    if (result.Succeeded)
+                    {
+                        string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+                        var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
 
-                    string emailText = "<p style=\"font-size:2em;padding-top:1em;padding-bottom:1em;padding-right:1em;padding-left:1em;line-height:150%;text-align:center;background-color:#7ac143 ;margin-top:auto;margin-bottom:auto;margin-right:auto;margin-left:auto;\" >" +
-                        "<a href=\"" + callbackUrl + "\" style=\"color:#fff;padding-top:1.3em;padding-bottom:1.3em;padding-right:1.3em;padding-left:1.3em;font-weight:bold;text-decoration:none;\" >Confirm my email address</a></p><br />" +
-                        "Thank you for registering for " + System.Web.Configuration.WebConfigurationManager.AppSettings["title"].ToString() + ". In order to proceed please <a href=\"" + callbackUrl + "\">confirm</a> your account. " +
-                        "If the link doesn't work copy and paste this link into your browser: " + callbackUrl + "<br />" +
-                        "<h2>Next Steps</h2><br />" +
-                        "Log in and complete the registration form for your child(ren).";
+                        string emailText = "<p style=\"font-size:2em;padding-top:1em;padding-bottom:1em;padding-right:1em;padding-left:1em;line-height:150%;text-align:center;background-color:#7ac143 ;margin-top:auto;margin-bottom:auto;margin-right:auto;margin-left:auto;\" >" +
+                            "<a href=\"" + callbackUrl + "\" style=\"color:#fff;padding-top:1.3em;padding-bottom:1.3em;padding-right:1.3em;padding-left:1.3em;font-weight:bold;text-decoration:none;\" >Confirm my email address</a></p><br />" +
+                            "Thank you for registering for " + System.Web.Configuration.WebConfigurationManager.AppSettings["title"].ToString() + ". In order to proceed please <a href=\"" + callbackUrl + "\">confirm</a> your account. " +
+                            "If the link doesn't work copy and paste this link into your browser: " + callbackUrl + "<br />" +
+                            "<h2>Next Steps</h2><br />" +
+                            "Log in and complete the registration form for your child(ren).";
 
-                    await UserManager.SendEmailAsync(user.Id, "Confirm your WRDSB " + System.Web.Configuration.WebConfigurationManager.AppSettings["title"].ToString() + " account : WRDSB",
-                        emailText);
+                        await UserManager.SendEmailAsync(user.Id, "Confirm your WRDSB " + System.Web.Configuration.WebConfigurationManager.AppSettings["title"].ToString() + " account : WRDSB",
+                            emailText);
 
-                    return View("EmailNotConfirmed");
+                        return View("EmailNotConfirmed");
+                    }
+                    AddErrors(result);
                 }
-                AddErrors(result);
-            }
 
-            // If we got this far, something failed, redisplay form
-            return View(model);
+                // If we got this far, something failed, redisplay form
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                Error error = new Error();
+                error.handleError(ex, "Exception occured during Registration.");
+                ModelState.AddModelError(string.Empty, "There was a problem when attempting to create an account. We are aware of the issue and will investigate. Please try creating an account again. If the issue continues contact " + System.Web.Configuration.WebConfigurationManager.AppSettings["feedbackEmail"].ToString());
+                return View(model);
+            }
         }
 
         //
