@@ -10,6 +10,7 @@
 
     <form id="loginform" runat="server">
     <fieldset>
+    <!--<p><a href="redirect to registration page" target="_blank">Register for an Account</a></p>-->
     <!-- Username -->
     <label for="txtUsername">Username</label>
     <asp:TextBox ID="txtUsername" runat="server"></asp:TextBox>
@@ -20,6 +21,7 @@
     <label for="txtPassword">Password</label>
     <!--<input name="sdlfkjsdflsj$TextBox1" type="text" ID="TextBox1" />-->
     <asp:TextBox ID="txtPassword" runat="server" TextMode="Password"></asp:TextBox>
+    <p><a href="https://mypassword.wrdsb.ca/" target="_blank">Forgot your Password?</a></p>
     <p class="alert alert-danger" role="alert" id="loginErrors" runat="server" style="visibility:hidden"></p>
 
     <!-- Submit Form -->
@@ -27,7 +29,6 @@
     <asp:Button ID="btnLogin" runat="server" Text="Login" OnClick="btnLogin_Click" />
     </fieldset>
     </form>
-    <!--<p><a href="redirect to registration page" target="_blank">Register for an Account</a></p>-->
-    <p class="fineprint"><a href="https://mypassword.wrdsb.ca/" target="_blank">Password Reset</a></p>
+
 </div>
 </asp:Content>
