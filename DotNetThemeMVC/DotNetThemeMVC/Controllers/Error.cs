@@ -52,7 +52,7 @@ namespace DotNetThemeMVC.Controllers
                 // -> “HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services\eventlog\WRDSB\System.Web.Configuration.WebConfigurationManager.AppSettings["loginTitle"].ToString()”
                 //2) Add a "String Value" titled "EventMessageFile" with a value of "C:\Windows\Microsoft.NET\Framework64\v4.0.30319\EventLogMessages.dll"
                 //See Documentation for more detailed instructions:
-                //LINK
+                //https://staff.wrdsb.ca/software-development/documentation/dot-net-theme/general-configuration-options/
 
                 //if stack trace is null reference then targetsite also returns null reference
                 //Get the name of the method that threw the exception
