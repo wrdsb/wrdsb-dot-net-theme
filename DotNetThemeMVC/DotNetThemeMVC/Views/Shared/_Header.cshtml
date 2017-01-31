@@ -110,7 +110,8 @@
             <div class="col-md-3 col-sm-3">
                 <div class="login-detail">
                     Logged in as: <b>@User.Identity.Name</b><br />
-                    @Html.ActionLink("Account Settings", "Index", "Manage")<br />
+                    @if (!User.IsInRole("Administrators")) { 
+                    @Html.ActionLink("Account Settings", "Index", "Manage")<br />}
                     @Html.ActionLink("Log off", "LogOff", "Account")
                 </div>
                 <div class="staff-shortcuts">
