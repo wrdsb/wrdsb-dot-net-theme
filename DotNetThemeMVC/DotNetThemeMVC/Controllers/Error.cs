@@ -16,17 +16,14 @@ namespace DotNetThemeMVC.Controllers
         {
             try
             {
-                //Fire off email
-                MailMessage message = new MailMessage();
-                message.From = new MailAddress("noreply@wrdsb.on.ca", "WRDSB");
-                message.To.Add(new MailAddress("_____@googleapps.wrdsb.ca"));
-                message.To.Add(new MailAddress("_____@wrdsb.on.ca"));
-
-                message.Subject = System.Web.Configuration.WebConfigurationManager.AppSettings["loginTitle"].ToString() + " Exception";
-
-                message.Body = emailText;
-                SmtpClient client = new SmtpClient();
-                client.Send(message);
+                //Let's not get stuck in a loop, if an excpeption occurs at the email code don't try to email
+                if (emailText != "Exception occured attempting to send email.")
+                {
+                    //Fire off email
+                    Email email = new Email();
+                    email.SendEmail("_____@wrdsb.on.ca", System.Web.Configuration.WebConfigurationManager.AppSettings["loginTitle"].ToString() + " Exception", emailText);
+                    email.SendEmail("_____@googleapps.wrdsb.ca", System.Web.Configuration.WebConfigurationManager.AppSettings["loginTitle"].ToString() + " Exception", emailText);
+                }
             }
             catch (Exception ex)
             {

@@ -120,7 +120,7 @@ namespace DotNetThemeMVC.Controllers
                     if (AuthenticateAD(model.Email, model.Password))
                     {
                         //Compare authenticated username against control administrator table
-                        //This requires configuration. Create a control table in a SQL DB.
+                        //1)This requires configuration. Create a control table in a SQL DB.
                         /* CREATE TABLE [dbo].[administrators](
                             [id] [uniqueidentifier] NOT NULL,
                             [username] [nvarchar](50) NOT NULL,
@@ -130,7 +130,8 @@ namespace DotNetThemeMVC.Controllers
                                 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
                             ) ON [PRIMARY]
                          */
-                        //When creating an ADO.Net model of the new table name it: administratorEntities
+                        //2)When creating an ADO.Net model of the new table name it: administratorEntities
+                        //3)Create the default Controller and Views for the administrator model
                         //if (CheckAdministrators(model.Email))
                         //{
                         //Check to see if a local account exists, if not create one. Set confirmedemail to true. Set Role to Administrators.
@@ -168,7 +169,7 @@ namespace DotNetThemeMVC.Controllers
                 if (!UserManager.IsEmailConfirmed(userid))
                 {
                     //Resend the code
-                    string callbackUrl = await SendEmailConfirmationTokenAsync(userid, "Confirm your " + System.Web.Configuration.WebConfigurationManager.AppSettings["title"].ToString() + " account : WRDSB");
+                    string callbackUrl = await SendEmailConfirmationTokenAsync(userid, "Confirm your " + System.Web.Configuration.WebConfigurationManager.AppSettings["title"].ToString() + " account : WRDSB", model.Email);
                     return View("EmailNotConfirmed");
                 }
                 else
@@ -223,13 +224,15 @@ namespace DotNetThemeMVC.Controllers
         /// <param name="userID"></param>
         /// <param name="subject"></param>
         /// <returns></returns>
-        private async Task<string> SendEmailConfirmationTokenAsync(string userID, string subject)
+        private async Task<string> SendEmailConfirmationTokenAsync(string userID, string subject, string to)
         {
             string code = await UserManager.GenerateEmailConfirmationTokenAsync(userID);
             var callbackUrl = Url.Action("ConfirmEmail", "Account",
                new { userId = userID, code = code }, protocol: Request.Url.Scheme);
-            await UserManager.SendEmailAsync(userID, subject,
-               "Please <a href=\"" + callbackUrl + "\">confirm</a> your account. If the link doesn't work copy and paste this url into a browser: " + callbackUrl);
+
+            string message = "Please <a href=\"" + callbackUrl + "\">confirm</a> your account. If the link doesn't work copy and paste this url into a browser: " + callbackUrl;
+            Email email = new Email();
+            email.SendEmail(to, subject, message);
 
             return callbackUrl;
         }
@@ -266,9 +269,8 @@ namespace DotNetThemeMVC.Controllers
                             "If the link doesn't work copy and paste this link into your browser: " + callbackUrl + "<br />" +
                             "<h2>Next Steps</h2><br />" +
                             "Log in and complete the registration form for your child(ren).";
-
-                        await UserManager.SendEmailAsync(user.Id, "Confirm your WRDSB " + System.Web.Configuration.WebConfigurationManager.AppSettings["title"].ToString() + " account : WRDSB",
-                            emailText);
+                        Email email = new Email();
+                        email.SendEmail(user.Email, "Confirm your WRDSB " + System.Web.Configuration.WebConfigurationManager.AppSettings["title"].ToString() + " account : WRDSB", emailText);
 
                         return View("EmailNotConfirmed");
                     }
@@ -335,7 +337,9 @@ namespace DotNetThemeMVC.Controllers
                     "If the link doesn't work copy and paste this link into your browser: " + callbackUrl +
                     "<br />If you did not request a password change ignore this email.";
 
-                await UserManager.SendEmailAsync(user.Id, "Reset Password for $ApplicationName account : WRDSB", emailText);
+                Email email = new Email();
+                email.SendEmail(model.Email, "Reset Password for WRDSB " + System.Web.Configuration.WebConfigurationManager.AppSettings["title"].ToString() + " account : WRDSB", emailText);
+                
                 return RedirectToAction("ForgotPasswordConfirmation", "Account");
             }
 

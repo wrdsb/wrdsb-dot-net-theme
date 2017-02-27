@@ -20,6 +20,7 @@ namespace DotNetThemeMVC
     {
         public async Task SendAsync(IdentityMessage message)
         {
+            /*
             //Store the passed in body text
             string bodyText = message.Body;
 
@@ -56,7 +57,7 @@ namespace DotNetThemeMVC
             using (var client = new SmtpClient()) // SmtpClient configuration comes from config file
             {
                 await client.SendMailAsync(email);
-            }
+            }*/
         }
     }
 
