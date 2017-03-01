@@ -160,6 +160,8 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Bundle.config" />
+    <Content Include="Config\ConnectionStrings.config" />
+    <Content Include="Config\AppSettings.config" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
