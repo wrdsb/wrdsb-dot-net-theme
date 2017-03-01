@@ -17,7 +17,7 @@ namespace DotNetTheme
 
         protected void btnLogin_Click(object sender, EventArgs e)
         {
-            String adPath = ""; //Fully-qualified Domain Name
+            String adPath = System.Web.Configuration.WebConfigurationManager.AppSettings["adAuthURL"].ToString();
             LdapAuthentication adAuth = new LdapAuthentication(adPath);
             try
             {
