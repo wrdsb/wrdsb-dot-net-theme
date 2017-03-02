@@ -42,10 +42,10 @@ namespace DotNetThemeMVC.Controllers
                 //https://documentation.mailgun.com/api-sending.html#examples
                 RestClient client = new RestClient();
                 client.BaseUrl = new Uri("https://api.mailgun.net/v3");
-                client.Authenticator = new HttpBasicAuthenticator("api", "GET VALUE FROM MAILGUN");
+                client.Authenticator = new HttpBasicAuthenticator("api", System.Web.Configuration.WebConfigurationManager.AppSettings["mailgunKey"].ToString());
 
                 RestRequest request = new RestRequest();
-                request.AddParameter("domain", "GET VALUE FROM MAILGUN", ParameterType.UrlSegment);
+                request.AddParameter("domain", System.Web.Configuration.WebConfigurationManager.AppSettings["mailgunDomain"].ToString(), ParameterType.UrlSegment);
                 request.Resource = "{domain}/messages";
                 request.AddParameter("from", "WRDSB (do not reply) <noreply@wrdsb.ca>");
                 request.AddParameter("to", to);
