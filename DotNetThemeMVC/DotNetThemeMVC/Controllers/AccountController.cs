@@ -64,7 +64,13 @@ namespace DotNetThemeMVC.Controllers
             ViewBag.ReturnUrl = returnUrl;
             return View();
         }
-
+        /*
+        /// <summary>
+        /// Authenticates an administrator against active directory.
+        /// </summary>
+        /// <param name="username">The input value for username</param>
+        /// <param name="password">The input value for password</param>
+        /// <returns>boolean</returns>
         public bool AuthenticateAD(string username, string password)
         {
             using (var context = new PrincipalContext(ContextType.Domain, System.Web.Configuration.WebConfigurationManager.AppSettings["adAuthURL"].ToString(), username, password))
@@ -74,25 +80,37 @@ namespace DotNetThemeMVC.Controllers
         }
 
         /// <summary>
-        /// Compares authentication administrator against a control table of access granted administrators.
+        /// Compares authentication board user against a control table of access granted board users
         /// </summary>
         /// <param name="username">The PAL username to verify</param>
         /// <returns>boolean</returns>
-        //public bool CheckAdministrators(string username)
-        //{
-        //    administratorEntities db = new administratorEntities();
-        //    var adminList = db.administrators.ToList();
+        public bool AuthorizedUser(string username)
+        {
+            boardUsersEntities db = new boardUsersEntities();
+            var userList = db.board_users.ToList();
 
-        //    foreach (administrators admin in adminList)
-        //    {
-        //        if (admin.username.Equals(username))
-        //        {
-        //            return true;
-        //        }
-        //    }
+            foreach (board_users user in userList)
+            {
+                if (user.username.Equals(username))
+                {
+                    return true;
+                }
+            }
 
-        //    return false;
-        //}
+            return false;
+        }
+
+        /// <summary>
+        /// Gets the role for a specified username
+        /// </summary>
+        /// <param name="username">The PAL username to lookup</param>
+        /// <returns>string</returns>
+        public string GetUserRole(string username)
+        {
+            boardUsersEntities db = new boardUsersEntities();
+            board_users user = db.board_users.Where(x => x.username == username).FirstOrDefault();
+            return user.role;
+        }*/
 
         // POST: /Account/Login
         /// <summary>
@@ -112,64 +130,91 @@ namespace DotNetThemeMVC.Controllers
             }
             try
             {
-                // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, change to shouldLockout: true
+                //This if block contains all code for authenticating a board user
+                //1)Uncomment this and the functions it calls to authenticate board users
+                //Functions:
+                //AuthenticateAD
+                //AuthorizedUser
+                //GetUserRole
+                //2)Uncomment all lines in AdministratorController, BoardUsersController, and RoleController
+                /*
                 if (!model.Email.Contains("@"))
                 {
                     //Authenticate against AD and then assign local accounts
                     if (AuthenticateAD(model.Email, model.Password))
                     {
                         //Compare authenticated username against control administrator table
-                        //1)This requires configuration. Create a control table in a SQL DB.
-                        /* CREATE TABLE [dbo].[administrators](
-                            [id] [uniqueidentifier] NOT NULL,
-                            [username] [nvarchar](50) NOT NULL,
-                            CONSTRAINT [PK_administrators] PRIMARY KEY CLUSTERED 
-                            (
-                                [id] ASC
-                                )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-                            ) ON [PRIMARY]
-                         */
-                        //2)When creating an ADO.Net model of the new table name it: administratorEntities
-                        //3)Create the default Controller and Views for the administrator model
-                        //if (CheckAdministrators(model.Email))
-                        //{
-                        //Check to see if a local account exists, if not create one. Set confirmedemail to true. Set Role to Administrators.
-                        //if (UserManager.FindByName(model.Email) == null)
-                        //{
-                        //    var user = new ApplicationUser { UserName = model.Email, Email = model.Email, EmailConfirmed = true };
-                        //    var result = await UserManager.CreateAsync(user, model.Password);
+                        if (AuthorizedUser(model.Email))
+                        {
+                            //Get the role that was assigned to the user by the administrator
+                            var userRole = GetUserRole(model.Email);
 
-                        //    //Check to see if the Administrator role exists, if not create one.
-                        //    var roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(new ApplicationDbContext()));
-                        //    if (roleManager.RoleExists("Administrators"))
-                        //    {
-                        //        var role = new Microsoft.AspNet.Identity.EntityFramework.IdentityRole();
-                        //        role.Name = "Administrators";
-                        //        roleManager.Create(role);
-                        //    }
-                        //    UserManager.AddToRole(user.Id, "Administrators");
-                        //}
-                        //}
-                        //else
-                        //{
-                        //ModelState.AddModelError(string.Empty, "Not an authorized user.");
-                        //return View(model);
-                        //}
+                            //1)This requires configuration. Create a control table in a SQL DB.
+                            // CREATE TABLE [dbo].[board_users](
+	                        //    [id] [uniqueidentifier] NOT NULL,
+	                        //    [username] [nvarchar](50) NOT NULL,
+	                        //    [role] [nvarchar](50) NOT NULL,
+                            //    CONSTRAINT [PK_board_users_1] PRIMARY KEY CLUSTERED 
+                            //    (
+	                        //        [id] ASC
+                            //        )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+                            //    ) ON [PRIMARY]
+                            
+                            //2)Insert yourself into board_users, substitute your PAL into the second parameter:
+                            //Insert INTO board_users(id, username,role) VALUES(NEWID(), '', 'SuperAdmin')
+                            //3)Insert yourself into AspNetUsers, substitute your email into the second parameter, PAL for the last parameter:
+                            //INSERT INTO AspNetUsers VALUES(NEWID(),'',1 ,NULL,NEWID(),NULL,0,0,NULL,1,0,'')
+                            //4)Insert a role into AspNetRoles:
+                            //INSERT INTO AspNetRoles VALUES(NEWID(),'SuperAdmin')
+                            //5)Insert a user role into AspNetUserRoles, substitute the id created in step 3 into the first parameter, substitute the id created in step 4 into the second parameter:
+                            //INSERT INTO AspNetUserRoles VALUES('','')
+                            //6)When creating an ADO.Net model of the new table name it: boardUserEntities
+
+                            //Creates the Role in the AspNetRoles table only for SuperAdmins
+                            if (userRole.Equals("SuperAdmin"))
+                            {
+                                var roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(new ApplicationDbContext()));
+                                if (roleManager.RoleExists(userRole) == false)
+                                {
+                                    var role = new Microsoft.AspNet.Identity.EntityFramework.IdentityRole();
+                                    role.Name = userRole;
+                                    roleManager.Create(role);
+                                }
+                            }
+
+                            ApplicationUser applicationUser = UserManager.FindByName(model.Email);
+                            await SignInManager.SignInAsync(applicationUser, isPersistent: false, rememberBrowser: false);
+
+                            //If they were linked to something inside the application send the user to that
+                            if (Url.IsLocalUrl(returnUrl))
+                            {
+                                return Redirect(returnUrl);
+                            }
+                            //If Signed in user is an administrator take them to the administrator home page
+                            else if (userRole.Equals("Administrators") || userRole.Equals("SuperAdmin"))
+                            {
+                                return RedirectToAction("Home", "Administrator");
+                            }
+                        }
+                        else
+                        {
+                            ModelState.AddModelError(string.Empty, "Not an authorized user.");
+                            return View(model);
+                        }
                     }
                     else
                     {
                         ModelState.AddModelError("", "Login failed.");
                         return View(model);
                     }
-                }
+                }*/
 
                 //Normal user login and routing
                 var userid = UserManager.FindByEmail(model.Email).Id;
                 if (!UserManager.IsEmailConfirmed(userid))
                 {
                     //Resend the code
-                    string callbackUrl = await SendEmailConfirmationTokenAsync(userid, "Confirm your " + System.Web.Configuration.WebConfigurationManager.AppSettings["title"].ToString() + " account : WRDSB", model.Email);
+                    string callbackUrl = await SendEmailConfirmationTokenAsync(userid, "Confirm your WRDSB " + System.Web.Configuration.WebConfigurationManager.AppSettings["title"].ToString() + "  account : WRDSB", model.Email);
                     return View("EmailNotConfirmed");
                 }
                 else
@@ -178,18 +223,6 @@ namespace DotNetThemeMVC.Controllers
                     switch (result)
                     {
                         case SignInStatus.Success:
-                            //If signed in user is administrator take them to the administrator home page unless they were linked to something specific
-                            if (UserManager.IsInRole(userid, "Administrators"))
-                            {
-                                if (Url.IsLocalUrl(returnUrl))
-                                {
-                                    return Redirect(returnUrl);
-                                }
-                                else
-                                {
-                                    return RedirectToAction("Home", "Administrator");
-                                }
-                            }
                             return RedirectToLocal(returnUrl);
                         case SignInStatus.LockedOut:
                             return View("Lockout");
@@ -205,7 +238,7 @@ namespace DotNetThemeMVC.Controllers
             catch (NullReferenceException e)
             {
                 //When an account doesnt exist the code: var userid = UserManager.FindByEmail(model.Email).Id; returns null
-                //Handle the errpr by redirecting to log in page, do not log this error to a db or emailing the developers
+                //Handle the error by redirecting to log in page, do not log this error to a db or emailing the developers
                 ModelState.AddModelError(string.Empty, "There was a problem when attempting to sign you in. We are aware of the issue and will investigate. Please try signing in again. If the issue continues contact " + System.Web.Configuration.WebConfigurationManager.AppSettings["feedbackEmail"].ToString());
                 return View(model);
             }

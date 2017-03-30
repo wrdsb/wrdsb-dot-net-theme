@@ -23,6 +23,9 @@ namespace DotNetThemeMVC.Controllers
                     Email email = new Email();
                     email.SendEmail("_____@wrdsb.on.ca", System.Web.Configuration.WebConfigurationManager.AppSettings["loginTitle"].ToString() + " Exception", emailText);
                     email.SendEmail("_____@googleapps.wrdsb.ca", System.Web.Configuration.WebConfigurationManager.AppSettings["loginTitle"].ToString() + " Exception", emailText);
+                    
+                    //If you want to email administrators
+                    //email.EmailAdministrators(System.Web.Configuration.WebConfigurationManager.AppSettings["loginTitle"].ToString() + " Exception", emailText);
                 }
             }
             catch (Exception ex)

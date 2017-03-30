@@ -5,6 +5,10 @@ using System.Web;
 using System.Web.Mvc;
 using RestSharp;
 using RestSharp.Authenticators;
+using System.Web.Security;
+using DotNetThemeMVC.Models;
+using Microsoft.AspNet.Identity.Owin;
+using Microsoft.AspNet.Identity;
 
 namespace DotNetThemeMVC.Controllers
 {
@@ -58,6 +62,32 @@ namespace DotNetThemeMVC.Controllers
             {
                 Error error = new Error();
                 error.handleError(ex, "Exception occured attempting to send email.");
+            }
+        }
+
+        /// <summary>
+        /// Emails all administrators of the application
+        /// </summary>
+        /// <param name="subject">The subject line of the email</param>
+        /// <param name="message">The body content of the email, html encoding accepted</param>
+        public void EmailAdministrators(string subject, string message)
+        {
+            ApplicationUserManager UserManager = System.Web.HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>();
+
+            //Get a list of administrator usernames from the admin table
+            //This needs updating, the table is now a list of all users with different roles, need to query db where role="administrators"
+            administratorEntities db = new administratorEntities();
+            List<administrators> administrators = new List<administrators>();
+            administrators = db.administrators.ToList();
+
+            //For each username, find the identity account and use it's email column in the call to SendMail function
+            foreach (var admin in administrators)
+            {
+                //Find the Identity account based on admin username
+                var user = UserManager.FindByName(admin.username);
+
+                //Call Email Function
+                SendEmail(user.Email, subject, message);
             }
         }
     }

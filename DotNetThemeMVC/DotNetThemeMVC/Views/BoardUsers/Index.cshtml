@@ -1,0 +1,50 @@
+﻿@model IEnumerable<DotNetThemeMVC.Models.board_users>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>User Management</h1>
+<p>
+    Manage which users have access to the application. The PAL usernames seen in the list below will have access based on the chosen role.
+</p>
+<br />
+<h2>Add User</h2>
+<p>
+    @Html.ActionLink("Add", "Create") a new user to the list of users.
+</p>
+<br />
+<h2>Edit Users</h2>
+<p>
+    Edit an existing users: PAL, Role<br />
+    Delete a user to remove access.
+</p>
+<table class="table">
+    <tr>
+        <th>
+            PAL
+        </th>
+        <th>
+            Role
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td class="text-center">
+                @Html.DisplayFor(modelItem => item.username)
+            </td>
+            <td class="text-center">
+                @Html.DisplayFor(modelItem => item.role)
+            </td>
+            <td class="text-center">
+                @Html.ActionLink("Edit", "Edit", new { id = item.id }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.id })
+            </td>
+        </tr>
+    }
+
+</table>

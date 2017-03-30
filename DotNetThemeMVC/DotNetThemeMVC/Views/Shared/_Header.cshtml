@@ -154,7 +154,7 @@
         <div class="collapse navbar-collapse">
             <ul id="menu-top-menu" class="nav nav-justified">
                 <li id="home_link" class="menu-item current-menu-item current_page_item menu-item-home"><a title="Take me to the home page" href="Default.aspx">Home</a></li>
-                @if (User.IsInRole("Administrators"))
+                @if (User.IsInRole("Administrators") || User.IsInRole("SuperAdmin"))
                 {
                     <li id="admin_link" class="menu-item menu-item-type-post_type menu-item-object-page"><a title="Take me to the admin page" href="@Url.Action("Index", "Administrator")">Administrators</a></li>
                 }

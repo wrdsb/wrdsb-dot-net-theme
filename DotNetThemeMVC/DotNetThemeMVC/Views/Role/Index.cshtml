@@ -1,0 +1,44 @@
+﻿@model IEnumerable<DotNetThemeMVC.Models.RoleViewModels>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Role Management</h1>
+<p>
+    Manage which Roles are available for administrators to assign to board users.
+</p>
+<br />
+<h2>Add Roles</h2>
+<p>
+    @Html.ActionLink("Add", "Create") a role to the list of roles.
+</p>
+<br />
+<h2>Edit Roles</h2>
+<p>
+    Edit an existing roles: name.<br />
+    Delete a role to remove it from the list.
+</p>
+<table class="table">
+    <tr>
+        <th>
+            Role Name
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.id }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.id })
+            </td>
+        </tr>
+    }
+
+</table>

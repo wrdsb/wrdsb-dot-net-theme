@@ -1,0 +1,22 @@
+﻿@{
+    ViewBag.Title = "Home";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Home</h2>
+<p>
+<!-->Add a decscription here for administrators to read, should give a brief overlay of what all the links
+    found below do, including any additional functions you've added for your application for administrators to perform</!-->
+</p>
+<hr />
+
+<h2>Board Users Management</h2>
+@Html.ActionLink("Set New Board User Access", "Create", "BoardUsers")<br />
+@Html.ActionLink("Manage Existing Board Users Access", "Index", "BoardUsers")<br />
+
+@if (User.IsInRole("SuperAdmin"))
+{
+    <h2>Role Management</h2>
+    @Html.ActionLink("Set New Roles", "Create", "Role")<br />
+    @Html.ActionLink("Manage Existing Roles", "Index", "Role")<br />
+}
