@@ -198,7 +198,7 @@ namespace DotNetThemeMVC.Controllers
                         }
                         else
                         {
-                            ModelState.AddModelError(string.Empty, "Not an authorized user.");
+                            ModelState.AddModelError(model.Email, "Not an authorized user.");
                             return View(model);
                         }
                     }
