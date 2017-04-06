@@ -14,6 +14,7 @@ using System.Web.Security;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System.DirectoryServices.AccountManagement;
 using DotNetThemeMVC;
+using PagedList;
 
 namespace WebApplication1.Controllers
 {
@@ -91,16 +92,21 @@ namespace WebApplication1.Controllers
         /// </summary>
         /// <returns>View</returns>
         [Authorize(Roles = "SuperAdmin,Administrators")]
-        public ActionResult Index()
+        public ActionResult Index(int? page)
         {
+            var pageNumber = page ?? 1;
             if (isAdministrator())
             {
-                return View(db.board_users.ToList().Where(x => x.role != "SuperAdmin"));
+                List<board_users> users = db.board_users.Where(x => x.role != "SuperAdmin").ToList();
+                PagedList<board_users> model = new PagedList<board_users>(users, pageNumber, 10);
+
+                return View(model);
             }
             else
             {
                 //Else you are a SuperAdmin and see everyone
-                return View(db.board_users.ToList());
+                PagedList<board_users> model = new PagedList<board_users>(db.board_users.ToList(), pageNumber, 10);
+                return View(model);
             }
         }
 
@@ -131,32 +137,43 @@ namespace WebApplication1.Controllers
         {
             if (ModelState.IsValid)
             {
-                board_users.id = Guid.NewGuid();
-                db.board_users.Add(board_users);
-                db.SaveChanges();
-
-                //Check to see if a local account exists, if not create one. Set ConfirmedEmail to true. Set Role.
-                if (UserManager.FindByName(board_users.username) == null)
+                if(!getExistingUser(board_users.username))
                 {
-                    var email = GetADEmail(board_users.username);
-
-                    if (email.Equals(""))
+                    //Check to see if a local account exists, if not create one. Set ConfirmedEmail to true. Set Role.
+                    if (UserManager.FindByName(board_users.username) == null)
                     {
-                        ModelState.AddModelError(board_users.username, "Failed to retrieve email for username from Active Directory");
-                        return View(board_users);
+                        var email = GetADEmail(board_users.username);
+
+                        if (email.Equals(""))
+                        {
+                            ModelState.AddModelError(board_users.username, "Failed to retrieve email for username from Active Directory");
+                            //The Viewbag for the role drop down needs to be set by who is signed in
+                            List<string> allRoles = getRoles();
+                            ViewBag.userRoles = new SelectList(allRoles);
+                            return View(board_users);
+                        }
+                        var user = new ApplicationUser { UserName = board_users.username, Email = email, EmailConfirmed = true };
+                        var result = UserManager.Create(user);
+
+                        //Assign role to the user
+                        UserManager.AddToRole(user.Id, board_users.role);
                     }
-                    var user = new ApplicationUser { UserName = board_users.username, Email = email, EmailConfirmed = true };
-                    var result = UserManager.Create(user);
 
-                    //Assign role to the user
-                    UserManager.AddToRole(user.Id, board_users.role);
+                    board_users.id = Guid.NewGuid();
+                    db.board_users.Add(board_users);
+                    db.SaveChanges();
+
+                    return RedirectToAction("Index");
                 }
-
-                return RedirectToAction("Index");
+                else
+                {
+                    ModelState.AddModelError(board_users.username, "This user exists.");
+                    //The Viewbag for the role drop down needs to be set by who is signed in
+                    List<string> allRoles = getRoles();
+                    ViewBag.userRoles = new SelectList(allRoles);
+                    return View(board_users);
+                }
             }
-            //The Viewbag for the role drop down needs to be set by who is signed in
-            List<string> allRoles = getRoles();
-            ViewBag.userRoles = new SelectList(allRoles);
             return View(board_users);
         }
 
@@ -210,6 +227,20 @@ namespace WebApplication1.Controllers
         {
             boardUsersEntities db = new boardUsersEntities();
             return db.board_users.Where(x => x.id == id).FirstOrDefault().role;
+        }
+        
+        /// <summary>
+        /// Check to see if a username exists in the board users table
+        /// </summary>
+        /// <param name="username">The username to look up</param>
+        /// <returns>bool</returns>
+        public bool getExistingUser(string username)
+        {
+            if(db.board_users.Any(x => x.username == username))
+            {
+                return true;
+            }
+            return false;
         }
 
         // POST: BoardUsers/Edit/5

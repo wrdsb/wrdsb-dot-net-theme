@@ -56,7 +56,8 @@ namespace DotNetThemeMVC.Controllers
                 request.AddParameter("subject", subject);
                 request.AddParameter("html", emailMessage);
                 request.Method = Method.POST;
-                client.Execute(request);
+                IRestResponse response = client.Execute(request);
+                var content = response.Content;
             }
             catch (Exception ex)
             {
@@ -72,22 +73,98 @@ namespace DotNetThemeMVC.Controllers
         /// <param name="message">The body content of the email, html encoding accepted</param>
         public void EmailAdministrators(string subject, string message)
         {
-            ApplicationUserManager UserManager = System.Web.HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>();
-
-            //Get a list of administrator usernames from the admin table
-            //This needs updating, the table is now a list of all users with different roles, need to query db where role="administrators"
-            administratorEntities db = new administratorEntities();
-            List<administrators> administrators = new List<administrators>();
-            administrators = db.administrators.ToList();
-
-            //For each username, find the identity account and use it's email column in the call to SendMail function
-            foreach (var admin in administrators)
+            try
             {
-                //Find the Identity account based on admin username
-                var user = UserManager.FindByName(admin.username);
+                ApplicationUserManager UserManager = System.Web.HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>();
 
-                //Call Email Function
-                SendEmail(user.Email, subject, message);
+                //Get a list of administrator usernames from the board users table
+                boardUsersEntities db = new boardUsersEntities();
+                List<board_users> administrators = new List<board_users>();
+                administrators = db.board_users.Where(x => x.role == "Administrators").ToList();
+
+                //For each username, find the identity account and use it's email column in the call to SendMail function
+                foreach (var admin in administrators)
+                {
+                    //Find the Identity account based on admin username
+                    var user = UserManager.FindByName(admin.username);
+
+                    //Call Email Function
+                    SendEmail(user.Email, subject, message);
+                }
+            }
+            catch (Exception ex)
+            {
+                Error error = new Error();
+                //Do not change this message, the error class looks for this exact message to prevent a loop
+                error.handleError(ex, "Exception occured attempting to send email.");
+            }
+        }
+
+        /// <summary>
+        /// Emails all super admins of the application
+        /// </summary>
+        /// <param name="subject">The subject line of the email</param>
+        /// <param name="message">The body content of the email, html encoding accepted</param>
+        public void EmailSuperAdmins(string subject, string message)
+        {
+            try
+            {
+                ApplicationUserManager UserManager = System.Web.HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>();
+
+                //Get a list of superadmin usernames from the board users table
+                boardUsersEntities db = new boardUsersEntities();
+                List<board_users> superadmins = new List<board_users>();
+                superadmins = db.board_users.Where(x => x.role == "SuperAdmins").ToList();
+
+                //For each username, find the identity account and use it's email column in the call to SendMail function
+                foreach (var superadmin in superadmins)
+                {
+                    //Find the Identity account based on admin username
+                    var user = UserManager.FindByName(superadmin.username);
+
+                    //Call Email Function
+                    SendEmail(user.Email, subject, message);
+                }
+            }
+            catch (Exception ex)
+            {
+                Error error = new Error();
+                //Do not change this message, the error class looks for this exact message to prevent a loop
+                error.handleError(ex, "Exception occured attempting to send email.");
+            }
+        }
+
+        /// <summary>
+        /// Emails all users of a specified role
+        /// </summary>
+        /// <param name="subject">The subject line of the email</param>
+        /// <param name="message">The body content of the email, html encoding accepted</param>
+        public void EmailSpecifiedRole(string role, string subject, string message)
+        {
+            try
+            {
+                ApplicationUserManager UserManager = System.Web.HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>();
+
+                //Get a list of usernames with a specified role from the board users table
+                boardUsersEntities db = new boardUsersEntities();
+                List<board_users> board_users = new List<board_users>();
+                board_users = db.board_users.Where(x => x.role == role).ToList();
+
+                //For each username, find the identity account and use it's email column in the call to SendMail function
+                foreach (var board_user in board_users)
+                {
+                    //Find the Identity account based on admin username
+                    var user = UserManager.FindByName(board_user.username);
+
+                    //Call Email Function
+                    SendEmail(user.Email, subject, message);
+                }
+            }
+            catch (Exception ex)
+            {
+                Error error = new Error();
+                //Do not change this message, the error class looks for this exact message to prevent a loop
+                error.handleError(ex, "Exception occured attempting to send email.");
             }
         }
     }

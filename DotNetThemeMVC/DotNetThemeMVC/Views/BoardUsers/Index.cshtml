@@ -1,9 +1,12 @@
-﻿@model IEnumerable<DotNetThemeMVC.Models.board_users>
+﻿@model PagedList<DotNetThemeMVC.Models.board_users>
 
 @{
     ViewBag.Title = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
+@using PagedList.Mvc;
+@using PagedList;
 
 <h1>User Management</h1>
 <p>
@@ -46,5 +49,7 @@
             </td>
         </tr>
     }
-
 </table>
+
+@Html.PagedListPager(Model, page => Url.Action("Index", new { page, pageSize = Model.PageSize }))
+Showing @Model.FirstItemOnPage to @Model.LastItemOnPage of @Model.TotalItemCount Board Users
