@@ -13,25 +13,31 @@
     Manage which users have access to the application. The PAL usernames seen in the list below will have access based on the chosen role.
 </p>
 <br />
-<h2>Add User</h2>
-<p>
-    @Html.ActionLink("Add", "Create") a new user to the list of users.
-</p>
-<br />
-<h2>Edit Users</h2>
-<p>
-    Edit an existing users: PAL, Role<br />
-    Delete a user to remove access.
-</p>
+<div class="col-md-12" style="padding-bottom:5px;padding-top:10px;">
+    <div class="col-md-4">
+        @using (Html.BeginForm())
+        {
+            @Html.TextBox("SearchString", null, new { placeholder = "Username" }) <input type="submit" value="Search" class="btn btn-default" />
+        }
+    </div>
+    <div class="col-md-8">
+        Filter:
+        @foreach (var role in ViewBag.userRoles)
+        {
+
+            @:&nbsp; @Html.ActionLink((string)role, "Index", new { role = (string)role })
+            }
+    </div>
+</div>
 <table class="table">
     <tr>
         <th>
-            PAL
+            @Html.ActionLink("PAL", "Index", new { sortOrder = ViewBag.NameSortParm, currentFilter = ViewBag.CurrentFilter })
         </th>
         <th>
             Role
         </th>
-        <th></th>
+        <th>Manage User @Html.ActionLink("(+)", "Create", null, htmlAttributes: new { @style = "color:green" })</th>
     </tr>
 
     @foreach (var item in Model)
@@ -51,5 +57,5 @@
     }
 </table>
 
-@Html.PagedListPager(Model, page => Url.Action("Index", new { page, pageSize = Model.PageSize }))
-Showing @Model.FirstItemOnPage to @Model.LastItemOnPage of @Model.TotalItemCount Board Users
+@Html.PagedListPager(Model, page => Url.Action("Index", new { page, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter, roleFilter = ViewBag.RoleFilter, pageSize = Model.PageSize }))
+    Showing @Model.FirstItemOnPage to @Model.LastItemOnPage of @Model.TotalItemCount Board Users

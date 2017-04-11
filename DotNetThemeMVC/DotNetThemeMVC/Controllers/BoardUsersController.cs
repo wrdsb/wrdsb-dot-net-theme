@@ -88,26 +88,61 @@ namespace WebApplication1.Controllers
 
         // GET: BoardUsers
         /// <summary>
-        /// Displays the Board Users Index page listing all board users.
+        /// Displays the Board Users Index page listing all board users. Allows for searching or filtering the users.
         /// </summary>
         /// <returns>View</returns>
         [Authorize(Roles = "SuperAdmin,Administrators")]
-        public ActionResult Index(int? page)
+        public ActionResult Index(int? page, string sortOrder, string currentFilter, string role, string searchString)
         {
-            var pageNumber = page ?? 1;
+            var users = from x in db.board_users select x;
+
+            //Filter the users and roles seen by the user based on their role
             if (isAdministrator())
             {
-                List<board_users> users = db.board_users.Where(x => x.role != "SuperAdmin").ToList();
-                PagedList<board_users> model = new PagedList<board_users>(users, pageNumber, 10);
+                users = from x in db.board_users where role != "SuperAdmin" select x;
+            }
+            List<string> allRoles = getRoles();
+            ViewBag.userRoles = allRoles;
+            
+            //Check to see if they have a Search term or are filtering based on role
+            var pageNumber = page ?? 1;
+            ViewBag.CurrentSort = sortOrder;
+            ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
 
-                return View(model);
+            if(searchString != null)
+            {
+                page = 1;
             }
             else
             {
-                //Else you are a SuperAdmin and see everyone
-                PagedList<board_users> model = new PagedList<board_users>(db.board_users.ToList(), pageNumber, 10);
-                return View(model);
+                searchString = currentFilter;
             }
+
+            ViewBag.CurrentFilter = searchString;
+            if(Request.QueryString["roleFilter"] != null)
+            {
+                role = Request.QueryString["roleFilter"];
+            }
+            ViewBag.RoleFilter = role;
+
+            if(!String.IsNullOrEmpty(searchString))
+            {
+                users = users.Where(x => x.username.Contains(searchString));
+            }
+            if(!String.IsNullOrEmpty(role))
+            {
+                users = users.Where(x => x.role.Equals(role));
+            }
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    users = users.OrderByDescending(x => x.username);
+                    break;
+                default: 
+                    users = users.OrderBy(x => x.username);
+                    break;
+            }
+            return View(users.ToPagedList(pageNumber, 10));
         }
 
         // GET: BoardUsers/Create
