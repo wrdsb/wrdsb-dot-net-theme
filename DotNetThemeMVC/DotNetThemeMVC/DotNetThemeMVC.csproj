@@ -187,12 +187,12 @@
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AdministratorController.cs" />
-    <Compile Include="Controllers\BoardUsersController.cs" />
     <Compile Include="Controllers\Email.cs" />
     <Compile Include="Controllers\Error.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\RoleController.cs" />
+    <Compile Include="Controllers\UserRoleController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -200,6 +200,8 @@
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\RoleViewModels.cs" />
+    <Compile Include="Models\UserRoleViewModel.cs" />
+    <Compile Include="Models\UserViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -264,22 +266,19 @@
     <Content Include="Views\Role\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\BoardUsers\Create.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\BoardUsers\Delete.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\BoardUsers\Edit.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\BoardUsers\Index.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Views\Administrator\Home.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\BoardUsers\SearchResults.cshtml" />
+    <Content Include="Views\UserRole\Create.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\UserRole\Delete.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\UserRole\Edit.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\UserRole\Index.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

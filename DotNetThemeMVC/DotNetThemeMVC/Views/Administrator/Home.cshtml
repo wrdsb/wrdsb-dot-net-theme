@@ -11,8 +11,8 @@
 <hr />
 
 <h2>Board Users Management</h2>
-@Html.ActionLink("Set New Board User Access", "Create", "BoardUsers")<br />
-@Html.ActionLink("Manage Existing Board Users Access", "Index", "BoardUsers")<br />
+@Html.ActionLink("Set New Board User Access", "Create", "UserRole")<br />
+@Html.ActionLink("Manage Existing Board Users Access", "Index", "UserRole")<br />
 
 @if (User.IsInRole("SuperAdmin"))
 {

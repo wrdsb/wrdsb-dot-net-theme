@@ -1,0 +1,117 @@
+﻿@model DotNetThemeMVC.Models.UserViewModel
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using PagedList.Mvc;
+@using PagedList;
+<!--<link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet" />
+<link href="https://s3.amazonaws.com/wrdsb-theme/css/ui/jquery-ui.css" rel="stylesheet" />
+<link href="https://s3.amazonaws.com/wrdsb-theme/css/ui/jquery.ui.base.css" rel="stylesheet" />
+<link href="https://s3.amazonaws.com/wrdsb-theme/css/ui/jquery.ui.theme.css" rel="stylesheet" />
+<link href="https://s3.amazonaws.com/wrdsb-theme/css/ui/jquery.ui.datepicker.css" rel="stylesheet" />
+<link href="https://s3.amazonaws.com/wrdsb-theme/css/ui/jquery.ui.autocomplete.css" rel="stylesheet" />
+<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"
+        integrity="sha256-0YPKAwZP7Mp3ALMRVB2i8GXeEndvCq3eSl/WsAl1Ryk="
+        crossorigin="anonymous"></script>-->
+
+<!--document.getElementById("searchTerms").value = ui.item.id;
+<script>
+    $(document).ready(function () {
+        $("#searchTerms").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: '@Url.Action("getADGroups", "UserRole")',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: { search: request.term },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            return { label: item.value, value: item.value };
+                        }));
+                    }
+                });
+            },
+            select: function (event, ui) {
+                $("searchTerms").val(ui.item.label);
+            }
+        });
+    });
+</script>
+<div>
+    @Html.TextBox("searchTerms", null, htmlAttributes: new { placeholder = "Group Name", @class = "form-inline" })
+</div>-->
+<h1>User Management</h1>
+<p>
+    Manage which users have access to the application. The PAL usernames seen in the list below will have access based on the chosen role.
+</p>
+@using (Html.BeginForm("Index", "UserRole", FormMethod.Post, new { @class = "form-inline" }))
+{
+    @Html.HiddenFor(model => model.sortOrder)
+    <div class="col-md-12">
+        <div class="col-md-4">
+            <label for="SearchString" class="sr-only">Username</label>
+            @Html.TextBoxFor(model => model.searchString, Model.searchString, new { placeholder = "Username", @class = "form-control" }) <input type="submit" value="Search" class="btn btn-default" />
+
+        </div>
+        <div class="col-md-3">
+
+            <label for="RolesFilter">Role:</label>
+            @Html.DropDownListFor(model => model.roleFilter, ViewBag.UserRoles as IEnumerable<SelectListItem>, new { @onchange = "submit();", @class = "form-control" })
+
+        </div>
+        <div class="col-md-3">
+
+            <label for="PageSize" class="form-inline">User per Page:</label>
+            @Html.DropDownListFor(model => model.pageSize, ViewBag.PageSize as IEnumerable<SelectListItem>, new { @onchange = "submit();", @class = "form-control" })
+
+        </div>
+        <div class="col-md-2">
+            @Html.ActionLink("Reset Options", "Index", new { sortOrder = "", roleFilter = "", searchString = "", page = 1, pageSize = 0 }, new { @class = "btn btn-default" })
+        </div>
+    </div>
+}
+<div style="padding-top: 50px;">
+    <table class="table table-condensed">
+        <tr>
+            <th>
+                @if (Model.sortOrder == "name_desc")
+                {
+                    @Html.ActionLink("PAL", "Index", new { sortOrder = "" })
+                }
+                else
+                {
+                    @Html.ActionLink("PAL", "Index", new { sortOrder = "name_desc" })
+                }
+            </th>
+            <th>
+                Role
+            </th>
+            <th>Manage User @Html.ActionLink("(+)", "Create", null, htmlAttributes: new { @style = "color:green" })</th>
+        </tr>
+
+        @foreach (var item in Model.Users)
+        {
+            <tr>
+                <td class="text-center">
+                    @Html.DisplayFor(modelItem => item.User.UserName)
+                </td>
+                <td class="text-center">
+                    @foreach (var role in item.userRoles)
+                    {
+                        @Html.DisplayFor(modelItem => role) @:
+                }
+                </td>
+                <td class="text-center">
+                    @Html.ActionLink("Edit", "Edit", new { id = item.User.Id }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.User.Id })
+                </td>
+            </tr>
+        }
+    </table>
+    @Html.DisplayFor(model => Model.sortOrder)
+    @Html.PagedListPager(Model.Users, page => Url.Action("Index", new { page, sortOrder = Model.sortOrder, searchString = Model.searchString, roleFilter = Model.roleFilter, pageSize = Model.pageSize }))
+    Showing @Model.Users.FirstItemOnPage to @Model.Users.LastItemOnPage of @Model.Users.TotalItemCount Board Users
+</div>

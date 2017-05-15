@@ -1,5 +1,4 @@
-﻿@model DotNetThemeMVC.Models.board_users
-
+﻿@model DotNetThemeMVC.Models.UserRoleViewModel
 @{
     ViewBag.Title = "Create";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -17,14 +16,14 @@
         <legend>User</legend>
         <div class="col-md-3">
             <div class="form-group">
-                @Html.LabelFor(model => model.username, "PAL")
-                @Html.TextBoxFor(model => model.username, new { @class = "form-control" })
-                @Html.ValidationMessageFor(model => model.username, "", new { @class = "text-danger" })
+                @Html.LabelFor(model => model.User.UserName, "PAL")
+                @Html.TextBoxFor(model => model.User.UserName, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.User.UserName, "", new { @class = "text-danger" })
             </div>
             <div class="form-group">
-                @Html.LabelFor(model => model.role, "Role")
-                @Html.DropDownListFor(model => model.role, ViewBag.userRoles as IEnumerable<SelectListItem>, new { @class = "form-control" })
-                @Html.ValidationMessageFor(model => model.role, "", new { @class = "text-danger" })
+                @Html.LabelFor(model => model.userRoles, "Role")
+                @Html.ListBoxFor(model => model.userRoles, new SelectList(Model.allRoles), new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.userRoles, "", new { @class = "text-danger" })
             </div>
         </div>
     </fieldset>
@@ -38,6 +37,3 @@
 <div>
     @Html.ActionLink("Back to List", "Index")
 </div>
-
-
-

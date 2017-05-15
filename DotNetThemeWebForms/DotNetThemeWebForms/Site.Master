@@ -12,18 +12,34 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
      
   <!-- Bootstrap -->
-  <link href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/css/bootstrap.css" rel="stylesheet" media="all">
-  <link href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/css/bootstrap-theme.css" rel="stylesheet">
-  <link href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/css/style.css" rel="stylesheet">
-  <link href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/css/icon-styles.css" rel="stylesheet">
+  <link href="<%=(String.Format("{0}{1}{2}","https://s3.amazonaws.com/wrdsb-ui-assets/",
+    System.Web.Configuration.WebConfigurationManager.AppSettings["awsVersion"].ToString(),
+      "/css/bootstrap.css"))%>" rel="stylesheet" media="all">
+  <link href="<%=(String.Format("{0}{1}{2}","https://s3.amazonaws.com/wrdsb-ui-assets/",
+    System.Web.Configuration.WebConfigurationManager.AppSettings["awsVersion"].ToString(),
+    "/css/bootstrap-theme.css"))%>" rel="stylesheet">
+  <link href="<%=(String.Format("{0}{1}{2}","https://s3.amazonaws.com/wrdsb-ui-assets/",
+    System.Web.Configuration.WebConfigurationManager.AppSettings["awsVersion"].ToString(),
+    "/css/style.css"))%>" rel="stylesheet">
+  <link href="<%=(String.Format("{0}{1}{2}","https://s3.amazonaws.com/wrdsb-ui-assets/",
+    System.Web.Configuration.WebConfigurationManager.AppSettings["awsVersion"].ToString(),
+    "/css/icon-styles.css"))%>" rel="stylesheet">
 
   <% string userAgent = Request.UserAgent; %>
   <% if (userAgent.Contains("iPad") || userAgent.Contains("iPhone") || userAgent.Contains("iPod")) %>
   <% { %>
-  <link href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/images/icon-60x60.png" rel="apple-touch-icon" />
-  <link href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/images/icon-76x76.png" rel="apple-touch-icon" sizes="76x76" />
-  <link href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/images/icon-120x120.png" rel="apple-touch-icon" sizes="120x120" />
-  <link href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/images/icon-152x152.png" rel="apple-touch-icon" sizes="152x152" />
+  <link href="<%=(String.Format("{0}{1}{2}","https://s3.amazonaws.com/wrdsb-ui-assets/",
+    System.Web.Configuration.WebConfigurationManager.AppSettings["awsVersion"].ToString(),
+    "/images/icon-60x60.png"))%>" rel="apple-touch-icon" />
+  <link href="<%=(String.Format("{0}{1}{2}","https://s3.amazonaws.com/wrdsb-ui-assets/",
+    System.Web.Configuration.WebConfigurationManager.AppSettings["awsVersion"].ToString(),
+    "/images/icon-76x76.png"))%>" rel="apple-touch-icon" sizes="76x76" />
+  <link href="<%=(String.Format("{0}{1}{2}","https://s3.amazonaws.com/wrdsb-ui-assets/",
+    System.Web.Configuration.WebConfigurationManager.AppSettings["awsVersion"].ToString(),
+    "/images/icon-120x120.png"))%>" rel="apple-touch-icon" sizes="120x120" />
+  <link href="<%=(String.Format("{0}{1}{2}","https://s3.amazonaws.com/wrdsb-ui-assets/",
+    System.Web.Configuration.WebConfigurationManager.AppSettings["awsVersion"].ToString(),
+    "/images/icon-152x152.png"))%>" rel="apple-touch-icon" sizes="152x152" />
   <% } %>
 
 
@@ -34,9 +50,15 @@
 
   <!-- Add to Home Screen Button -->
 
-  <link href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/css/addtohomescreen.css" rel="stylesheet">
-  <script src="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/js/addtohomescreen.min.js"></script>
-  <script src="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/js/jquery/jquery.floatThead.min.js"></script>
+  <link href="<%=(String.Format("{0}{1}{2}","https://s3.amazonaws.com/wrdsb-ui-assets/",
+    System.Web.Configuration.WebConfigurationManager.AppSettings["awsVersion"].ToString(),
+    "/css/addtohomescreen.css"))%>" rel="stylesheet">
+  <script src="<%=(String.Format("{0}{1}{2}","https://s3.amazonaws.com/wrdsb-ui-assets/",
+    System.Web.Configuration.WebConfigurationManager.AppSettings["awsVersion"].ToString(),
+    "/js/addtohomescreen.min.js"))%>"></script>
+  <script src="<%=(String.Format("{0}{1}{2}","https://s3.amazonaws.com/wrdsb-ui-assets/",
+    System.Web.Configuration.WebConfigurationManager.AppSettings["awsVersion"].ToString(),
+    "/jquery/jquery.floatThead.min.js"))%>"></script>
 
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -67,11 +89,17 @@
       $("table").wrap("<div class='table-responsive'></div>");
   </script>
 
-  <script type='text/javascript' src='http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/js/jquery/jquery.js?ver=1.12.4'></script>
-  <script type='text/javascript' src='http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/js/jquery/jquery-migrate.min.js?ver=1.4.1'></script>
+  <script type='text/javascript' src="<%=(String.Format("{0}{1}{2}","https://s3.amazonaws.com/wrdsb-ui-assets/",
+    System.Web.Configuration.WebConfigurationManager.AppSettings["awsVersion"].ToString(),
+    "/jquery/jquery.js"))%>."></script>
+  <script type='text/javascript' src="<%=(String.Format("{0}{1}{2}","https://s3.amazonaws.com/wrdsb-ui-assets/",
+    System.Web.Configuration.WebConfigurationManager.AppSettings["awsVersion"].ToString(),
+    "/jquery/jquery-migrate.min.js"))%>"></script>
 
   <!-- Favicon -->
-  <link rel="shortcut icon" type="image/png" href="http://wrdsb-theme.s3-website-us-east-1.amazonaws.com/favicon.png" />
+  <link rel="shortcut icon" type="image/png" href="<%=(String.Format("{0}{1}{2}","https://s3.amazonaws.com/wrdsb-ui-assets/",
+    System.Web.Configuration.WebConfigurationManager.AppSettings["awsVersion"].ToString(),
+    "/images/favicon.png"))%>" />
 
   <!-- Google Analytics 
   <script type="text/javascript">

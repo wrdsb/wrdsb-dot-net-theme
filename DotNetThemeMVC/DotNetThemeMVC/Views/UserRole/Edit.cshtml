@@ -1,0 +1,39 @@
+﻿@model DotNetThemeMVC.Models.UserRoleViewModel
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Edit</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.Partial("_ValidationSummary", ViewData.ModelState)
+    @Html.HiddenFor(model => model.User.Id)
+    <fieldset>
+        <legend>User</legend>
+        <div class="col-md-3">
+            <div class="form-group">
+                @Html.LabelFor(model => model.User.UserName, "PAL")
+                @Html.EditorFor(model => model.User.UserName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.User.UserName, "", new { @class = "text-danger" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.userRoles, "Role")
+                @Html.ListBoxFor(model => model.userRoles, new SelectList(Model.allRoles), new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.userRoles, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </fieldset>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Save" class="btn btn-default" />
+        </div>
+    </div>
+
+}
+<br />
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
