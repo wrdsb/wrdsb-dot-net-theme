@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Web;
 using System.Configuration;
 using System.Net.Mail;
+using System.Web.Configuration;
 
 namespace DotNetThemeMVC.Controllers
 {
@@ -21,11 +22,12 @@ namespace DotNetThemeMVC.Controllers
                 {
                     //Fire off email
                     Email email = new Email();
-                    email.SendEmail("_____@wrdsb.on.ca", System.Web.Configuration.WebConfigurationManager.AppSettings["loginTitle"].ToString() + " Exception", emailText);
-                    email.SendEmail("_____@googleapps.wrdsb.ca", System.Web.Configuration.WebConfigurationManager.AppSettings["loginTitle"].ToString() + " Exception", emailText);
+                    //Add custom recipients for error handling
+                    //email.SendEmail("_____@wrdsb.on.ca", System.Web.Configuration.WebConfigurationManager.AppSettings["loginTitle"].ToString() + " Exception", emailText);
+                    //email.SendEmail("_____@googleapps.wrdsb.ca", System.Web.Configuration.WebConfigurationManager.AppSettings["loginTitle"].ToString() + " Exception", emailText);
                     
-                    //If you want to email administrators
-                    //email.EmailAdministrators(System.Web.Configuration.WebConfigurationManager.AppSettings["loginTitle"].ToString() + " Exception", emailText);
+                    //Email Super Administrators an alert of an exception
+                    email.EmailSuperAdmins(WebConfigurationManager.AppSettings["loginTitle"].ToString() + " Exception", emailText);
                 }
             }
             catch (Exception ex)
@@ -41,7 +43,7 @@ namespace DotNetThemeMVC.Controllers
                 {
                     errorMessage += "\r\nInner: " + ex.InnerException.ToString();
                 }
-                log.Source = System.Web.Configuration.WebConfigurationManager.AppSettings["loginTitle"].ToString();
+                log.Source = WebConfigurationManager.AppSettings["loginTitle"].ToString();
                 log.WriteEntry(errorMessage, System.Diagnostics.EventLogEntryType.Error);
             }
 
@@ -93,7 +95,7 @@ namespace DotNetThemeMVC.Controllers
                 {
                     errorMessage += "\r\nInner: " + ex.InnerException.ToString();
                 }
-                log.Source = System.Web.Configuration.WebConfigurationManager.AppSettings["loginTitle"].ToString();
+                log.Source = WebConfigurationManager.AppSettings["loginTitle"].ToString();
                 log.WriteEntry(errorMessage, System.Diagnostics.EventLogEntryType.Error);
             }
         }

@@ -18,6 +18,7 @@ using Microsoft.ApplicationInsights.Extensibility;
 using NLog;
 using Microsoft.ApplicationInsights.NLogTarget;
 using NLog.Config;
+using Microsoft.ApplicationInsights;
 
 namespace DotNetThemeMVC.Controllers
 {
@@ -274,7 +275,11 @@ namespace DotNetThemeMVC.Controllers
 
                             logger.Trace(applicationUser.UserName.ToString() + " logged in at " + DateTime.Now);
                             */
-                            
+
+                            //Method 3
+                            //Found under MEtrics Explorer after adding chart tracking type: "Events"
+                            TelemetryClient telemetry = new TelemetryClient();
+                            telemetry.TrackEvent(applicationUser.UserName.ToString() + " logged in at " + DateTime.Now);
                             //Azure Test Logging
 
                             //If they were linked to something inside the application send the user to that
