@@ -14,6 +14,10 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using System.DirectoryServices.AccountManagement;
 using System.Collections.Generic;
 using System.Configuration;
+using Microsoft.ApplicationInsights.Extensibility;
+using NLog;
+using Microsoft.ApplicationInsights.NLogTarget;
+using NLog.Config;
 
 namespace DotNetThemeMVC.Controllers
 {
@@ -242,6 +246,36 @@ namespace DotNetThemeMVC.Controllers
                         {
                             ApplicationUser applicationUser = UserManager.FindByName(model.Email);
                             await SignInManager.SignInAsync(applicationUser, isPersistent: false, rememberBrowser: false);
+
+                            //Azure Test Logging
+                            //Method1
+                            
+                            //TelemetryConfiguration.Active.InstrumentationKey = "";
+                            Logger logger = LogManager.GetLogger("WRDSB Test");
+                            logger.Trace(applicationUser.UserName.ToString() + " logged in at " + DateTime.Now);
+                            logger.Info("This is a test message at an INFO Level");
+                            logger.Fatal("This is a test message at a FATA: Level");
+
+                            //Method2
+                            /*
+                            var config = new LoggingConfiguration();
+                            
+                            ApplicationInsightsTarget target = new ApplicationInsightsTarget();
+                            // You need this only if you did not define InstrumentationKey in ApplicationInsights.config or want to use different instrumentation key
+                            target.InstrumentationKey = "";
+                            target.Name = "WRDSB Test";
+                            config.AddTarget("WRDSB Test", target);
+                            LoggingRule rule = new LoggingRule("*", LogLevel.Fatal, target);
+                            config.LoggingRules.Add(rule);
+
+                            LogManager.Configuration = config;
+
+                            Logger logger = LogManager.GetLogger("LogIns");
+
+                            logger.Trace(applicationUser.UserName.ToString() + " logged in at " + DateTime.Now);
+                            */
+                            
+                            //Azure Test Logging
 
                             //If they were linked to something inside the application send the user to that
                             if (Url.IsLocalUrl(returnUrl))
