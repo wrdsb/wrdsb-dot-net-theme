@@ -17,8 +17,15 @@ namespace DotNetThemeMVC.Controllers
 {
     public class Error
     {
+        /// <summary>
+        /// This will email super admins a notification of an exception. The exception details
+        /// are logged to AWS CloudWatch.
+        /// </summary>
+        /// <param name="exception">The captured exception object.</param>
+        /// <param name="emailText">The body text to send in the email.</param>
         public void handleError(Exception exception, string emailText)
         {
+            //Send the Super Admins a notification
             try
             {
                 //Let's not get stuck in a loop, if an excpeption occurs at the email code don't try to email
@@ -31,7 +38,7 @@ namespace DotNetThemeMVC.Controllers
                     //email.SendEmail("_____@wrdsb.on.ca", WebConfigurationManager.AppSettings["loginTitle"].ToString() + " Exception", emailText);
                     //email.SendEmail("_____@googleapps.wrdsb.ca", WebConfigurationManager.AppSettings["loginTitle"].ToString() + " Exception", emailText);
                     
-                    //If you want to email administrators
+                    //Email Super Admins about the exception
                     email.EmailSuperAdmins(WebConfigurationManager.AppSettings["loginTitle"].ToString() + " Exception", emailText);
                 }
             }
@@ -58,14 +65,20 @@ namespace DotNetThemeMVC.Controllers
                 log.WriteEntry(errorMessage, System.Diagnostics.EventLogEntryType.Error);
             }
 
+            //Send the exception information to AWS Cloudwatch
+            //This requires configuration, see documentation:
+            //LINK coming soon
             try
             {
-
-#if DEBUG
+                //Set the logging group based on debug/production switch
+                //Logs will be sent to "/dotnet/$your_applictation_name/$environment
+                #if DEBUG
                 string environment = "test";
-#else
+                #else
                 string environment = "production";
-#endif
+                #endif
+
+                //Set the AWS values, log group, log level
                 var config = new LoggingConfiguration();
                 var awsTarget = new AWSTarget()
                 {
@@ -76,8 +89,6 @@ namespace DotNetThemeMVC.Controllers
                 config.LoggingRules.Add(new LoggingRule("*", LogLevel.Fatal, awsTarget));
                 LogManager.Configuration = config;
                 Logger logger = LogManager.GetCurrentClassLogger();
-                //logger.Info("Check the AWS Console Cloudwatch Logs in us-east-1");
-                //logger.Fatal("Fatal error occured");
 
                 //if stack trace is null reference then targetsite also returns null reference
                 //Get the name of the method that threw the exception
@@ -90,8 +101,9 @@ namespace DotNetThemeMVC.Controllers
                 var line = frame.GetFileLineNumber();
                 var filename = frame.GetFileName();
                 
-                //Compare what gets logged
-                //come up with a good format
+                //Send the event to AWS CloudWatch
+                //Current Format is: [FileName:value][MethodName:value][LineNumber:value][RawMessage:value]
+                //This will be found in the Message portion of Cloudwatch logs
                 logger.Fatal("[Filename:" + filename + "][MethodName:" + methodName + "][LineNumber:" + line + "][RawMessage:" + exception.Message.ToString()+"]");
             }
             catch (Exception ex)

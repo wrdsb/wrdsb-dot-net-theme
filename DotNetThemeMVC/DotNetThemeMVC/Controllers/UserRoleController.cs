@@ -241,9 +241,12 @@ namespace DotNetThemeMVC.Controllers
                 //Update the Role Assignments
                 var roles = UserManager.GetRoles(model.User.Id);
                 UserManager.RemoveFromRoles(model.User.Id, roles.ToArray());
-                foreach (var userRole in model.userRoles)
+                if (model.userRoles != null)
                 {
-                    UserManager.AddToRole(model.User.Id, userRole);
+                    foreach (var userRole in model.userRoles)
+                    {
+                        UserManager.AddToRole(model.User.Id, userRole);
+                    }
                 }
                 return RedirectToAction("Index");
             }
