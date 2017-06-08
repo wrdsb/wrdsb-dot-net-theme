@@ -682,5 +682,84 @@ namespace DotNetThemeMVC.Controllers
 }
          */
 
+        //ajax to get adgroup names as you type view code/controller code
+        /*
+        <!--<link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet" />-->
+<link href="https://s3.amazonaws.com/wrdsb-theme/css/ui/jquery-ui.css" rel="stylesheet" />
+<link href="https://s3.amazonaws.com/wrdsb-theme/css/ui/jquery.ui.base.css" rel="stylesheet" />
+<link href="https://s3.amazonaws.com/wrdsb-theme/css/ui/jquery.ui.theme.css" rel="stylesheet" />
+<link href="https://s3.amazonaws.com/wrdsb-theme/css/ui/jquery.ui.datepicker.css" rel="stylesheet" />
+<link href="https://s3.amazonaws.com/wrdsb-theme/css/ui/jquery.ui.autocomplete.css" rel="stylesheet" />
+<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"
+        integrity="sha256-0YPKAwZP7Mp3ALMRVB2i8GXeEndvCq3eSl/WsAl1Ryk="
+        crossorigin="anonymous"></script>
+        <!--document.getElementById("searchTerms").value = ui.item.id;-->
+<script>
+    $(document).ready(function () {
+        $("#searchTerms").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: '@Url.Action("getADGroups", "UserRole")',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: { search: request.term },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            return { label: item.value, value: item.value };
+                        }));
+                    }
+                });
+            },
+            select: function (event, ui) {
+                $("searchTerms").val(ui.item.label);
+            }
+        });
+    });
+</script>
+
+<div>
+    @Html.TextBox("searchTerms", null, htmlAttributes: new { placeholder = "Group Name", @class = "form-inline" })
+</div>
+
+        [HttpPost]
+        public ActionResult getADGroups(string search)
+        {
+            PrincipalContext context = new PrincipalContext(ContextType.Domain,System.Web.Configuration.WebConfigurationManager.AppSettings["adAuthURL"].ToString());
+            GroupPrincipal groupPrincipal = new GroupPrincipal(context);
+
+            groupPrincipal.Name = search + "*";
+
+            PrincipalSearcher principalSearch = new PrincipalSearcher(groupPrincipal);
+
+            List<string> results = new List<string>();
+            var result = new List<KeyValuePair<string, string>>();
+
+            int count = 0;
+            var list = new List<JsonResults>();
+
+            foreach (var found in principalSearch.FindAll())
+            {
+                if (count == 5)
+                {
+                    break;
+                }
+                //results.Add(found.Name);
+                //result.Add(new KeyValuePair<string, string>(found.Name, found.Name));
+                list.Add(new JsonResults { id = count.ToString(), label = found.Name, value = found.Name });
+                count += 1;
+            }
+
+            return Json(list, JsonRequestBehavior.AllowGet);
+        }
+    }
+
+    public class JsonResults
+    {
+        public string id { get; set; }
+        public string label { get; set; }
+        public string value { get; set; }
+    }
+         */
+
     }
 }
