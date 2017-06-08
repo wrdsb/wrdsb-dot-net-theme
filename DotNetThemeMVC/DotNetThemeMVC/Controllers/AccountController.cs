@@ -210,6 +210,8 @@ namespace DotNetThemeMVC.Controllers
                             //Coming Soon
                             //Call a Function and return true/false
                             //userIsAuthorized = Function(model.Email);
+                            //return false if local identity account not found
+                            //that means admin removed user specifically from list
                         }
 
                         //Authorize the user through IPPS

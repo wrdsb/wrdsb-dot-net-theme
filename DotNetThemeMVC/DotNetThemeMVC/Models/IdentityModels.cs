@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using System.Data.Entity;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -28,5 +29,7 @@ namespace DotNetThemeMVC.Models
         {
             return new ApplicationDbContext();
         }
+
+        public DbSet<ad_group_roles> ad_group_roles { get; set; }
     }
 }

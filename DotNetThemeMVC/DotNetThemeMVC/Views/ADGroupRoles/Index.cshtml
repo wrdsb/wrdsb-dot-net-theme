@@ -1,0 +1,39 @@
+﻿@model IEnumerable<DotNetThemeMVC.Models.ADGroupRolesViewModel>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+
+<table class="table table-condensed">
+    <tr>
+        <th>
+            Group
+        </th>
+        <th>
+            Role
+        </th>
+        <th></th>
+    </tr>
+
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td class="text-center">
+                @Html.DisplayFor(modelItem => item.groupName)
+            </td>
+            <td class="text-center">
+                @foreach (var role in item.groupRoles)
+                {
+                    @Html.DisplayFor(modelItem => role) @:
+                }
+            </td>
+            <td class="text-center">
+                @Html.ActionLink("Edit", "Edit", new { id = item.groupName }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.groupName })
+            </td>
+        </tr>
+    }
+</table>

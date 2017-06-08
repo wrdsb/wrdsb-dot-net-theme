@@ -119,6 +119,8 @@
     <Reference Include="System.Data" />
     <Reference Include="System.DirectoryServices.AccountManagement" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -206,6 +208,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\ADGroupRolesController.cs" />
     <Compile Include="Controllers\AdministratorController.cs" />
     <Compile Include="Controllers\Email.cs" />
     <Compile Include="Controllers\Error.cs" />
@@ -217,6 +220,25 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\ADGroupRolesModel.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ADGroupRolesModel.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ADGroupRolesModel.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ADGroupRolesModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ADGroupRolesModel.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ADGroupRolesModel.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ADGroupRolesViewModel.cs" />
+    <Compile Include="Models\ad_group_roles.cs">
+      <DependentUpon>ADGroupRolesModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\RoleViewModels.cs" />
@@ -228,6 +250,16 @@
   <ItemGroup>
     <Content Include="Content\PagedList.css" />
     <Content Include="Global.asax" />
+    <Content Include="Models\ADGroupRolesModel.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>ADGroupRolesModel.edmx</DependentUpon>
+      <LastGenOutput>ADGroupRolesModel.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\ADGroupRolesModel.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>ADGroupRolesModel.edmx</DependentUpon>
+      <LastGenOutput>ADGroupRolesModel.cs</LastGenOutput>
+    </Content>
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -299,6 +331,26 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\UserRole\Index.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <EntityDeploy Include="Models\ADGroupRolesModel.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>ADGroupRolesModel.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Models\ADGroupRolesModel.edmx.diagram">
+      <DependentUpon>ADGroupRolesModel.edmx</DependentUpon>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\ADGroupRoles\Index.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\ADGroupRoles\Create.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

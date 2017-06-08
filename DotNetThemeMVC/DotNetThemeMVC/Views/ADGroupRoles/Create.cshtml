@@ -1,0 +1,39 @@
+﻿@model DotNetThemeMVC.Models.ADGroupRolesViewModel
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Authorize a Group</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    @Html.Partial("_ValidationSummary", ViewData.ModelState)
+
+    <fieldset>
+        <legend>User</legend>
+        <div class="col-md-3">
+            <div class="form-group">
+                @Html.LabelFor(model => model.groupName, "Active Directory Group Name")
+                @Html.TextBoxFor(model => model.groupName, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.groupName, "", new { @class = "text-danger" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.groupRoles, "Role")
+                @Html.ListBoxFor(model => model.groupRoles, new SelectList(Model.allRoles), new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.groupRoles, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </fieldset>
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" class="btn btn-default" />
+        </div>
+    </div>
+}
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
