@@ -132,6 +132,39 @@ namespace DotNetThemeMVC.Controllers
             return accounts;
         }
 
+        public bool IsMemberOfADGroup(string account, string adGroup)
+        {
+            PrincipalContext context = new PrincipalContext(ContextType.Domain, WebConfigurationManager.AppSettings["adAuthURL"].ToString());
+            UserPrincipal user = UserPrincipal.FindByIdentity(context, account);
+            GroupPrincipal group = GroupPrincipal.FindByIdentity(context, adGroup);
+
+            if (user.IsMemberOf(group))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public bool IsPermissionedByGroup(string account, string removedRole)
+        {
+            List<string> adGroupNames = db.ad_group_roles.Select(x => x.group_name).Distinct().ToList();
+            foreach (var adGroupName in adGroupNames)
+            {
+                if (IsMemberOfADGroup(account, adGroupName))
+                {
+                    List<string> roles = db.ad_group_roles.Where(x => x.group_name == adGroupName).Select(x => x.role_name).ToList();
+                    foreach (var role in roles)
+                    {
+                        if (role.Equals(removedRole))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
         // GET: ADGroupRoles
         /// <summary>
         /// Displays the AD Group Roles Index page listing all AD Group to Role associations.
@@ -299,42 +332,73 @@ namespace DotNetThemeMVC.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    //Get a list of all the accounts that belong to the selected AD Group Name
-                    List<string> accounts = GetADAccounts(adGroupRolesViewModel.groupName);
-                    if (accounts == null)
-                    {
-                        ModelState.AddModelError(adGroupRolesViewModel.groupName, "Failed to retrieve users belonging to the AD Group.");
-                        return View(adGroupRolesViewModel);
-                    }
+                    //Check to see that permissions were changed for the active directory group
 
                     //Get the current list of roles for the active directory group
                     List<string> adGroupRoles = db.ad_group_roles.Where(x => x.group_name == adGroupRolesViewModel.groupName).Select(z => z.role_name).OrderBy(x => x).ToList();
 
-                    //Loop through list of PAL names and create accounts(if needed) and add permissions(if selected)
-                    foreach (string account in accounts)
+                    //Sequence requires same order
+                    adGroupRolesViewModel.groupRoles.OrderBy(x => x);
+
+                    //If the selected Roles are different to whats on record we update account permissions
+                    if (!adGroupRolesViewModel.groupRoles.SequenceEqual(adGroupRoles))
                     {
-                        //Check to see if an identity account exists
-                        bool userExists = AccountExists(account);
-                        if (userExists)
+                        //Get a list of all the accounts that belong to the selected AD Group Name
+                        List<string> accounts = GetADAccounts(adGroupRolesViewModel.groupName);
+                        if (accounts == null)
                         {
-                            //If the permissions have changed we update the accounts
-                            //SequenceEquals needs same order
-                            adGroupRolesViewModel.groupRoles.OrderBy(x => x);
-                            if(!adGroupRolesViewModel.groupRoles.SequenceEqual(adGroupRoles))
+                            ModelState.AddModelError(adGroupRolesViewModel.groupName, "Failed to retrieve users belonging to the AD Group.");
+                            return View(adGroupRolesViewModel);
+                        }
+
+                        //Compare newly selected roles and current and get a list of removed roles
+                        List<string> removedRoles = adGroupRoles.Except(adGroupRolesViewModel.groupRoles).ToList();
+                        //Compare current and newly selected roles and get a list of newly selected roles
+                        List<string> newRoles = adGroupRolesViewModel.groupRoles.Except(adGroupRoles).ToList();
+
+                        //Loop through list of PAL names and create accounts(if needed) and add permissions(if selected)
+                        foreach (string account in accounts)
+                        {
+                            //Check to see if an identity account exists
+                            bool userExists = AccountExists(account);
+                            if (userExists)
                             {
-                                //shii...ooot
-                                //authorizing multi groups
-                                //usre can be multiple times
-                                //however if oth groups say this user need permission of 'User'
-                                //in the add thats fine it checks if the account has that permission already before assinging
-                                //however in edit group role association removing a role from a group doesnt mean i can remove the role from the user
-                                //i would have to see if they belong to other authorized groups and if only they don't have the same role assigned could i remove the user from the role
+                                if(removedRoles != null)
+                                {
+                                    foreach(var role in removedRoles)
+                                    {
+                                        if (!IsPermissionedByGroup(account, role))
+                                        {
+                                            var userId = UserManager.FindByName(account).Id;
+
+                                            if (UserManager.IsInRole(userId, role))
+                                            {
+                                                UserManager.RemoveFromRole(userId, role);
+                                            }
+                                        }
+                                    }
+                                }
+
+                                //For every new role assign the user the role if they aren't assigned it yet
+                                if (newRoles != null)
+                                {
+                                    foreach (var role in newRoles)
+                                    {
+                                        var userId = UserManager.FindByName(account).Id;
+
+                                        if (!UserManager.IsInRole(userId, role))
+                                        {
+                                            UserManager.AddToRole(userId, role);
+                                        }
+                                    }
+                                }
                             }
                         }
+                        //still need to remove/add from db
+                        //db.Entry(ad_group_roles).State = EntityState.Modified;
+                        //db.SaveChanges();
+                        return RedirectToAction("Index");
                     }
-                    //db.Entry(ad_group_roles).State = EntityState.Modified;
-                    //db.SaveChanges();
-                    return RedirectToAction("Index");
                 }
                 return View(adGroupRolesViewModel);
             }
