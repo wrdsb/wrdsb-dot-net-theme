@@ -248,7 +248,7 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\PagedList.css" />
+    <Content Include="Error.aspx" />
     <Content Include="Global.asax" />
     <Content Include="Models\ADGroupRolesModel.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
@@ -260,6 +260,7 @@
       <DependentUpon>ADGroupRolesModel.edmx</DependentUpon>
       <LastGenOutput>ADGroupRolesModel.cs</LastGenOutput>
     </Content>
+    <Content Include="images\moss.gif" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -354,6 +355,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\ADGroupRoles\Edit.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Properties\PublishProfiles\Test.pubxml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
