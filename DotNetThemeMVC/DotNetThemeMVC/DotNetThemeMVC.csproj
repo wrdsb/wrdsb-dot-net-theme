@@ -260,7 +260,6 @@
       <DependentUpon>ADGroupRolesModel.edmx</DependentUpon>
       <LastGenOutput>ADGroupRolesModel.cs</LastGenOutput>
     </Content>
-    <Content Include="images\moss.gif" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -358,6 +357,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\PublishProfiles\Test.pubxml" />
+    <Content Include="Views\ADGroupRoles\Delete.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

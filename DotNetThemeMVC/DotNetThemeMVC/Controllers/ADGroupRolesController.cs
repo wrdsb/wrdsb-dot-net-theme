@@ -122,10 +122,14 @@ namespace DotNetThemeMVC.Controllers
             {
                 foreach (Principal p in group.GetMembers())
                 {
-                    //UserPrincipal user = p as UserPrincipal;
-                    if (p != null)
+                    //Make sure p is a user and not a group within a group
+                    if (p != null && p is UserPrincipal)
                     {
-                        accounts.Add(p.SamAccountName.ToLower());
+                        //Filter out non character names as well
+                        if (p.SamAccountName.All(Char.IsLetter))
+                        {
+                            accounts.Add(p.SamAccountName.ToLower());
+                        }
                     }
                 }
             }
@@ -145,9 +149,30 @@ namespace DotNetThemeMVC.Controllers
             return false;
         }
 
-        public bool IsPermissionedByGroup(string account, string removedRole)
+        public bool IsPermissionedByGroupToEdit(string account, string removedRole, string groupName)
+        {
+            //List<string> adGroupNames = db.ad_group_roles.Select(x => x.group_name).Distinct().ToList();
+            //foreach (var adGroupName in adGroupNames)
+            //{
+                if (IsMemberOfADGroup(account, groupName))
+                {
+                    List<string> roles = db.ad_group_roles.Where(x => x.group_name == groupName).Select(x => x.role_name).ToList();
+                    foreach (var role in roles)
+                    {
+                        if (role.Equals(removedRole))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            //}
+            return false;
+        }
+
+        public bool IsPermissionedByOtherGroups(string account, string removedRole, string excludeGroup)
         {
             List<string> adGroupNames = db.ad_group_roles.Select(x => x.group_name).Distinct().ToList();
+            adGroupNames.Remove(excludeGroup);
             foreach (var adGroupName in adGroupNames)
             {
                 if (IsMemberOfADGroup(account, adGroupName))
@@ -286,6 +311,9 @@ namespace DotNetThemeMVC.Controllers
                 Error error = new Error();
                 error.handleError(ex, "Exception occured during Group Authorization.");
                 ModelState.AddModelError(string.Empty, "There was a problem when attempting to authorize a group. We are aware of the issue and will investigate. Please try authorizing a group again. If the issue continues contact an Administrator.");
+
+                List<string> allRoles = GetRoleNames();
+                adGroupRolesViewModel.allRoles = allRoles;
                 return View(adGroupRolesViewModel);
             }
         }
@@ -363,24 +391,29 @@ namespace DotNetThemeMVC.Controllers
                             bool userExists = AccountExists(account);
                             if (userExists)
                             {
-                                if(removedRoles != null)
+                                if(removedRoles.Count > 0)
                                 {
                                     foreach(var role in removedRoles)
                                     {
-                                        if (!IsPermissionedByGroup(account, role))
+                                        //Does the removed role come from the group that is being edited
+                                        if (IsPermissionedByGroupToEdit(account, role, adGroupRolesViewModel.groupName))
                                         {
-                                            var userId = UserManager.FindByName(account).Id;
-
-                                            if (UserManager.IsInRole(userId, role))
+                                            //Does the removed role come from other groups that still apply the role
+                                            if (!IsPermissionedByOtherGroups(account, role, adGroupRolesViewModel.groupName))
                                             {
-                                                UserManager.RemoveFromRole(userId, role);
+                                                var userId = UserManager.FindByName(account).Id;
+
+                                                if (UserManager.IsInRole(userId, role))
+                                                {
+                                                    UserManager.RemoveFromRole(userId, role);
+                                                }
                                             }
                                         }
                                     }
                                 }
 
                                 //For every new role assign the user the role if they aren't assigned it yet
-                                if (newRoles != null)
+                                if (newRoles.Count > 0)
                                 {
                                     foreach (var role in newRoles)
                                     {
@@ -394,9 +427,25 @@ namespace DotNetThemeMVC.Controllers
                                 }
                             }
                         }
-                        //still need to remove/add from db
-                        //db.Entry(ad_group_roles).State = EntityState.Modified;
-                        //db.SaveChanges();
+
+                        //For all the removed roles, remove the record to the ad_group_roles table
+                        foreach (var role in removedRoles)
+                        {
+                            ad_group_roles searchGroup = db.ad_group_roles.Where(x => x.group_name == adGroupRolesViewModel.groupName).Where(x => x.role_name == role).FirstOrDefault();
+
+                            db.ad_group_roles.Attach(searchGroup);
+                            db.Entry(searchGroup).State = EntityState.Deleted;
+                        }
+                        //For all the new roles, add a record to the ad_group_roles table
+                        foreach (var role in newRoles)
+                        {
+                            ad_group_roles ad = new ad_group_roles();
+                            ad.group_name = adGroupRolesViewModel.groupName;
+                            ad.role_name = role;
+                            db.ad_group_roles.Add(ad);
+                        }
+                        db.SaveChanges();
+
                         return RedirectToAction("Index");
                     }
                 }
@@ -407,9 +456,22 @@ namespace DotNetThemeMVC.Controllers
                 Error error = new Error();
                 error.handleError(ex, "Exception occured during Group Authorization.");
                 ModelState.AddModelError(string.Empty, "There was a problem when attempting to permission a group. We are aware of the issue and will investigate. Please try permissioning a group again. If the issue continues contact an Administrator.");
+                List<string> allRoles = GetRoleNames();
+                adGroupRolesViewModel.allRoles = allRoles;
                 return View(adGroupRolesViewModel);
             }
         }
+
+        [Authorize(Roles = "SuperAdmin,Administrators")]
+        public ActionResult Delete(string id)
+        {
+
+            return View();
+        }
+
+
+
+
         //some reference code
         /*
          using System;
