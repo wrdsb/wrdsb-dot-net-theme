@@ -20,6 +20,7 @@ namespace DotNetThemeMVC.Controllers
     [Authorize]
     public class AccountController : Controller
     {
+        private ApplicationDbContext db = new ApplicationDbContext();
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
 
@@ -92,7 +93,6 @@ namespace DotNetThemeMVC.Controllers
             return user.EmailAddress;
         }
 
-        /*
         ///This section is a work in progress, change to function being called from Login()
         /// <summary>
         /// Checks to see if the username belongs to a group(AD,IPPS,Trillium)
@@ -110,31 +110,31 @@ namespace DotNetThemeMVC.Controllers
             if (ADGroupsEnabled.Equals("enabled"))
             {
                 //Get the list of approved Groups
-                //List<string> approvedGroups = db.grouproles.toList().group;
+                List<string> approvedGroups = db.ad_group_roles.Select(z => z.group_name).Distinct().ToList();
 
                 PrincipalContext context = new PrincipalContext(ContextType.Domain, System.Web.Configuration.WebConfigurationManager.AppSettings["adAuthURL"].ToString());
                 UserPrincipal user = UserPrincipal.FindByIdentity(context, username);
 
-                //Foreach group
-                //Does AD group contain username
-                //return true
-                //foreach(approvedGroup in approvedGroups)
-                //{}
-                GroupPrincipal group = GroupPrincipal.FindByIdentity(context, "approvedGroup");
-                if (user != null)
+                //Find out if the supplied username belongs to any Active Directory Group that has been authorized
+                foreach (var approvedGroup in approvedGroups)
                 {
-                    if (user.IsMemberOf(group))
+                    GroupPrincipal group = GroupPrincipal.FindByIdentity(context, approvedGroup);
+                    if (user != null && group != null)
                     {
-                        return true;
+                        if (user.IsMemberOf(group))
+                        {
+                            return true;
+                        }
                     }
                 }
+                return false;
             }
 
             //Other Group Based Authorization can be written here(IPPS, Trillium) Future Versions
             //If IPPS is enabled execute the below code
             //If Trillium is enabled execute the below code
             return false;
-        }*/
+        }
 
         /// <summary>
         /// Checks to see if an Account Exists for the supplied username
@@ -197,21 +197,32 @@ namespace DotNetThemeMVC.Controllers
                         //Set a flag, if user is Authorized set to true
                         bool userIsAuthorized = false;
 
-                        //Authorize the user through Control Table(AspNetUsers)
-                        if (ConfigurationManager.AppSettings["controlTableAuth"].Equals("true"))
-                        {
-                            //Call a Function and return true/false
-                            userIsAuthorized = accountExists(model.Email);
-                        }
-
                         //Authorize the user through AD Groups
                         if (ConfigurationManager.AppSettings["adGroupAuth"].Equals("true"))
                         {
-                            //Coming Soon
-                            //Call a Function and return true/false
-                            //userIsAuthorized = Function(model.Email);
-                            //return false if local identity account not found
-                            //that means admin removed user specifically from list
+                            //Get the status of membership and account existence
+                            bool isGroupMember = IsMemberOf(model.Email);
+                            bool accountExist = accountExists(model.Email);
+
+                            //Is a member, account exists, authorized
+                            //User is a member of authorized active directory groups and has an account in the users table
+                            if(isGroupMember && accountExist)
+                            {
+                                userIsAuthorized = true;
+                            }
+                            //Is a member, account doesnt exist, not authorized
+                            //User is a member of authorized active directory groups but the admin removed the account in the users table
+                            else if(isGroupMember && !accountExist)
+                            {
+                                userIsAuthorized = false;
+                            }
+                            //Is not a member, account exists, authorized
+                            //User is not a member of authorized active directory groups, but the admin added the account in the users table
+                            else if(!isGroupMember && accountExist)
+                            {
+                                userIsAuthorized = true;
+                            }
+
                         }
 
                         //Authorize the user through IPPS
@@ -220,6 +231,13 @@ namespace DotNetThemeMVC.Controllers
                             //Coming Soon
                             //Call a Function and return true/false
                             //userIsAuthorized = Function(model.Email);
+                        }
+
+                        //Authorize the user through Control Table(AspNetUsers)
+                        if (ConfigurationManager.AppSettings["controlTableAuth"].Equals("true"))
+                        {
+                            //Call a Function and return true/false
+                            userIsAuthorized = accountExists(model.Email);
                         }
 
                         //No Authorization

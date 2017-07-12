@@ -465,11 +465,140 @@ namespace DotNetThemeMVC.Controllers
         [Authorize(Roles = "SuperAdmin,Administrators")]
         public ActionResult Delete(string id)
         {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
 
-            return View();
+            //Unable to find group based on parameter
+            ad_group_roles ad_group_roles = db.ad_group_roles.Where(x => x.group_name == id).FirstOrDefault();
+            if (ad_group_roles == null)
+            {
+                return HttpNotFound();
+            }
+
+            //Get the Active Directory Group Roles and save it to the model
+            List<string> allRoles = GetRoleNames();
+            List<string> adGroupRoles = db.ad_group_roles.Where(x => x.group_name == id).Select(z => z.role_name).ToList();
+
+            ADGroupRolesViewModel model = new ADGroupRolesViewModel();
+            model.allRoles = allRoles;
+            model.groupName = id;
+            model.groupRoles = adGroupRoles;
+            return View(model);
         }
 
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "SuperAdmin,Administrators")]
+        public ActionResult DeleteConfirmed(string id)
+        {
+            try
+            {
+                ADGroupRolesViewModel adGroupRolesViewModel = new ADGroupRolesViewModel();
+                adGroupRolesViewModel.groupName = id;
+                adGroupRolesViewModel.groupRoles = db.ad_group_roles.Where(x => x.group_name == id).Select(z => z.role_name).ToList();
+                //Get a list of all the accounts that belong to the selected AD Group Name
+                List<string> accounts = GetADAccounts(adGroupRolesViewModel.groupName);
+                if (accounts == null)
+                {
+                    ModelState.AddModelError(id, "Failed to retrieve users belonging to the AD Group.");
+                    return View(id);
+                }
 
+                //Loop through list of PAL names and create accounts(if needed) and add permissions(if selected)
+                foreach (string account in accounts)
+                {
+                    //Check to see if an identity account exists
+                    bool userExists = AccountExists(account);
+                    if (userExists)
+                    {
+                        if (adGroupRolesViewModel.groupRoles.Count > 0)
+                        {
+                            foreach (var role in adGroupRolesViewModel.groupRoles)
+                            {
+                                //Does the role come from the group that is being deleted
+                                if (IsPermissionedByGroupToEdit(account, role, adGroupRolesViewModel.groupName))
+                                {
+                                    //Does the role come from other groups that still apply the role
+                                    if (!IsPermissionedByOtherGroups(account, role, adGroupRolesViewModel.groupName))
+                                    {
+                                        var userId = UserManager.FindByName(account).Id;
+
+                                        if (UserManager.IsInRole(userId, role))
+                                        {
+                                            UserManager.RemoveFromRole(userId, role);
+                                        }
+                                    }
+                                }
+                            }
+                            //If the account has no roles, delete it
+                            var user = UserManager.FindByName(account);
+                            var roles = UserManager.GetRoles(user.Id);
+                            if (roles.Count == 0)
+                            {
+                                UserManager.Delete(user);
+                            }
+                        }
+                    }
+                }
+                foreach (var role in adGroupRolesViewModel.groupRoles)
+                {
+                    ad_group_roles searchGroup = db.ad_group_roles.Where(x => x.group_name == adGroupRolesViewModel.groupName).Where(x => x.role_name == role).FirstOrDefault();
+
+                    db.ad_group_roles.Attach(searchGroup);
+                    db.Entry(searchGroup).State = EntityState.Deleted;
+                }
+                db.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                Error error = new Error();
+                error.handleError(ex, "Exception occured during Group Authorization.");
+                ModelState.AddModelError(string.Empty, "There was a problem when attempting to delete a group. We are aware of the issue and will investigate. Please try permissioning a group again. If the issue continues contact an Administrator.");
+
+                return View("Error");
+            }
+        }
+
+        public class JsonResults
+        {
+            public string id { get; set; }
+            public string label { get; set; }
+            public string value { get; set; }
+        }
+
+        [HttpPost]
+        public ActionResult getADGroups(string search)
+        {
+            PrincipalContext context = new PrincipalContext(ContextType.Domain,System.Web.Configuration.WebConfigurationManager.AppSettings["adAuthURL"].ToString());
+            GroupPrincipal groupPrincipal = new GroupPrincipal(context);
+
+            groupPrincipal.Name = search + "*";
+
+            PrincipalSearcher principalSearch = new PrincipalSearcher(groupPrincipal);
+
+            List<string> results = new List<string>();
+            var result = new List<KeyValuePair<string, string>>();
+
+            int count = 0;
+            var list = new List<JsonResults>();
+
+            foreach (var found in principalSearch.FindAll())
+            {
+                if (count == 5)
+                {
+                    break;
+                }
+                //results.Add(found.Name);
+                //result.Add(new KeyValuePair<string, string>(found.Name, found.Name));
+                list.Add(new JsonResults { id = count.ToString(), label = found.Name, value = found.Name });
+                count += 1;
+            }
+
+            return Json(list, JsonRequestBehavior.AllowGet);
+        }
 
 
         //some reference code

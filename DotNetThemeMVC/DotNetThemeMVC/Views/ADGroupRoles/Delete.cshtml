@@ -1,8 +1,37 @@
-﻿
+﻿@model DotNetThemeMVC.Models.ADGroupRolesViewModel
 @{
     ViewBag.Title = "Delete";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Delete</h2>
+<h2>Delete the AD Group Permissions</h2>
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.Hidden(Model.groupName)
 
+    <fieldset>
+        <legend>Active Directory Group Permissions</legend>
+        <div class="col-md-3">
+            <div class="form-group">
+                @Html.LabelFor(model => model.groupName, "Active Directory Group Name")<br />
+                @Html.DisplayFor(model => model.groupName)
+            </div>
+            <div class="form-group">
+                @foreach (var role in Model.groupRoles)
+                {
+                    @Html.DisplayFor(modelItem => role) @:
+                }
+            </div>
+        </div>
+    </fieldset>
+
+    <h3>Are you sure you want to delete this?</h3>
+    <div class="form-actions no-color">
+        <input type="submit" value="Delete" class="btn btn-default" />
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
