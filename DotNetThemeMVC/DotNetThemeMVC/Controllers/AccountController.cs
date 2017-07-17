@@ -13,12 +13,14 @@ using System.Web.Security;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System.DirectoryServices.AccountManagement;
 using System.Collections.Generic;
+using System.Configuration;
 
 namespace DotNetThemeMVC.Controllers
 {
     [Authorize]
     public class AccountController : Controller
     {
+        private ApplicationDbContext db = new ApplicationDbContext();
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
 
@@ -64,9 +66,9 @@ namespace DotNetThemeMVC.Controllers
             ViewBag.ReturnUrl = returnUrl;
             return View();
         }
-        /*
+        
         /// <summary>
-        /// Authenticates an administrator against active directory.
+        /// Authenticates a user against active directory.
         /// </summary>
         /// <param name="username">The input value for username</param>
         /// <param name="password">The input value for password</param>
@@ -80,37 +82,104 @@ namespace DotNetThemeMVC.Controllers
         }
 
         /// <summary>
-        /// Compares authentication board user against a control table of access granted board users
+        /// Returns the administrators email address from AD
         /// </summary>
-        /// <param name="username">The PAL username to verify</param>
-        /// <returns>boolean</returns>
-        public bool AuthorizedUser(string username)
+        /// <param name="username">The input value for username</param>
+        /// <returns>string</returns>
+        public string GetADEmail(string username)
         {
-            boardUsersEntities db = new boardUsersEntities();
-            var userList = db.board_users.ToList();
+            PrincipalContext context = new PrincipalContext(ContextType.Domain, System.Web.Configuration.WebConfigurationManager.AppSettings["adAuthURL"].ToString());
+            UserPrincipal user = UserPrincipal.FindByIdentity(context, username);
+            return user.EmailAddress;
+        }
 
-            foreach (board_users user in userList)
+        ///This section is a work in progress, change to function being called from Login()
+        /// <summary>
+        /// Checks to see if the username belongs to a group(AD,IPPS,Trillium)
+        /// See Documentation for enabling required Authorization: <a href=
+        /// </summary>
+        /// <param name="username">The username to verify</param>
+        /// <returns>bool</returns>
+        public bool IsMemberOf(string username)
+        {
+            //Read the AppSettings config file to see if any external authentication has been enabled
+            string ADGroupsEnabled = System.Web.Configuration.WebConfigurationManager.AppSettings["adGroupAuth"].ToString();
+
+
+            //If AD Groups is enabled execute the below code
+            if (ADGroupsEnabled.Equals("enabled"))
             {
-                if (user.username.Equals(username))
+                //Get the list of approved Groups
+                List<string> approvedGroups = db.ad_group_roles.Select(z => z.group_name).Distinct().ToList();
+
+                PrincipalContext context = new PrincipalContext(ContextType.Domain, System.Web.Configuration.WebConfigurationManager.AppSettings["adAuthURL"].ToString());
+                UserPrincipal user = UserPrincipal.FindByIdentity(context, username);
+
+                //Find out if the supplied username belongs to any Active Directory Group that has been authorized
+                foreach (var approvedGroup in approvedGroups)
                 {
-                    return true;
+                    GroupPrincipal group = GroupPrincipal.FindByIdentity(context, approvedGroup);
+                    if (user != null && group != null)
+                    {
+                        if (user.IsMemberOf(group))
+                        {
+                            return true;
+                        }
+                    }
                 }
+                return false;
             }
 
+            //Other Group Based Authorization can be written here(IPPS, Trillium) Future Versions
+            //If IPPS is enabled execute the below code
+            //If Trillium is enabled execute the below code
             return false;
         }
 
         /// <summary>
-        /// Gets the role for a specified username
+        /// Checks to see if an Account Exists for the supplied username
         /// </summary>
-        /// <param name="username">The PAL username to lookup</param>
-        /// <returns>string</returns>
-        public string GetUserRole(string username)
+        /// <param name="username">The input value for username</param>
+        /// <returns>boolean</returns>
+        public bool accountExists(string username)
         {
-            boardUsersEntities db = new boardUsersEntities();
-            board_users user = db.board_users.Where(x => x.username == username).FirstOrDefault();
-            return user.role;
-        }*/
+            if (UserManager.FindByName(username) != null)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Creates an account for the supplied username
+        /// </summary>
+        /// <param name="username">The input value for username</param>
+        public bool createAccount(string username)
+        {
+            string email = GetADEmail(username);
+            if(String.IsNullOrEmpty(email))
+            {
+                return false;
+            }
+            var user = new ApplicationUser { UserName = username, Email = GetADEmail(username), EmailConfirmed = true };
+            UserManager.Create(user);
+            return true;
+        }
+
+        /// <summary>
+        /// Checks to see if the user is in the Administrator Role
+        /// </summary>
+        /// <returns>boolean</returns>
+        public bool isAdministrator(string username)
+        {
+            var user = UserManager.FindByName(username);
+
+            if (UserManager.IsInRole(user.Id, "Administrators") || UserManager.IsInRole(user.Id, "SuperAdmin"))
+            {
+                return true;
+            }
+            return false;
+        }
 
         // POST: /Account/Login
         /// <summary>
@@ -130,58 +199,74 @@ namespace DotNetThemeMVC.Controllers
             }
             try
             {
-                //This if block contains all code for authenticating a board user
-                //1)Uncomment this and the functions it calls to authenticate board users
-                //Functions:
-                //AuthenticateAD
-                //AuthorizedUser
-                //GetUserRole
-                //2)Uncomment all lines in AdministratorController, BoardUsersController, and RoleController
-                /*
+                // This doesn't count login failures towards account lockout
+                // To enable password failures to trigger account lockout, change to shouldLockout: true
                 if (!model.Email.Contains("@"))
                 {
-                    //Authenticate against AD and then assign local accounts
+                    //Authenticate against AD
                     if (AuthenticateAD(model.Email, model.Password))
                     {
-                        //Compare authenticated username against control administrator table
-                        if (AuthorizedUser(model.Email))
+                        //User has authenticated
+                        //Check which Authorization method is enabled
+
+                        //Set a flag, if user is Authorized set to true
+                        bool userIsAuthorized = false;
+
+                        //Authorize the user through AD Groups
+                        if (ConfigurationManager.AppSettings["adGroupAuth"].Equals("true"))
                         {
-                            //Get the role that was assigned to the user by the administrator
-                            var userRole = GetUserRole(model.Email);
+                            //Get the status of membership and account existence
+                            bool isGroupMember = IsMemberOf(model.Email);
+                            bool accountExist = accountExists(model.Email);
 
-                            //1)This requires configuration. Create a control table in a SQL DB.
-                            // CREATE TABLE [dbo].[board_users](
-	                        //    [id] [uniqueidentifier] NOT NULL,
-	                        //    [username] [nvarchar](50) NOT NULL,
-	                        //    [role] [nvarchar](50) NOT NULL,
-                            //    CONSTRAINT [PK_board_users_1] PRIMARY KEY CLUSTERED 
-                            //    (
-	                        //        [id] ASC
-                            //        )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-                            //    ) ON [PRIMARY]
-                            
-                            //2)Insert yourself into board_users, substitute your PAL into the second parameter:
-                            //Insert INTO board_users(id, username,role) VALUES(NEWID(), '', 'SuperAdmin')
-                            //3)Insert yourself into AspNetUsers, substitute your email into the second parameter, PAL for the last parameter:
-                            //INSERT INTO AspNetUsers VALUES(NEWID(),'',1 ,NULL,NEWID(),NULL,0,0,NULL,1,0,'')
-                            //4)Insert a role into AspNetRoles:
-                            //INSERT INTO AspNetRoles VALUES(NEWID(),'SuperAdmin')
-                            //5)Insert a user role into AspNetUserRoles, substitute the id created in step 3 into the first parameter, substitute the id created in step 4 into the second parameter:
-                            //INSERT INTO AspNetUserRoles VALUES('','')
-                            //6)When creating an ADO.Net model of the new table name it: boardUserEntities
-
-                            //Creates the Role in the AspNetRoles table only for SuperAdmins
-                            if (userRole.Equals("SuperAdmin"))
+                            //Is a member, account exists, authorized
+                            if(isGroupMember && accountExist)
                             {
-                                var roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(new ApplicationDbContext()));
-                                if (roleManager.RoleExists(userRole) == false)
+                                userIsAuthorized = true;
+                            }
+                            //Administrator accounts may not be in the authorized Active Directory group
+                            //Check if the username  is an administrator
+                            if(isAdministrator(model.Email))
+                            {
+                                userIsAuthorized = true;
+                            }
+                        }
+
+                        //Authorize the user through IPPS
+                        if (ConfigurationManager.AppSettings["ippsGroupAuth"].Equals("true"))
+                        {
+                            //Coming Soon
+                            //Call a Function and return true/false
+                            //userIsAuthorized = Function(model.Email);
+                        }
+
+                        //Authorize the user through Control Table(AspNetUsers)
+                        if (ConfigurationManager.AppSettings["controlTableAuth"].Equals("true"))
+                        {
+                            //Call a Function and return true/false
+                            userIsAuthorized = accountExists(model.Email);
+                        }
+
+                        //No Authorization
+                        if (ConfigurationManager.AppSettings["noAuth"].Equals("true"))
+                        {
+                            //Check if local account exists
+                            //Create if needed
+                            if (!accountExists(model.Email))
+                            {
+                                var status = createAccount(model.Email);
+                                if(!status)
                                 {
-                                    var role = new Microsoft.AspNet.Identity.EntityFramework.IdentityRole();
-                                    role.Name = userRole;
-                                    roleManager.Create(role);
+                                    ModelState.AddModelError(model.Email, "Failed to retrieve email for username from Active Directory. Contact an administrator for help.");
+                                    return View(model);
                                 }
                             }
 
+                            //Everyone is Authorized
+                            userIsAuthorized = true;
+                        }
+                        if (userIsAuthorized)
+                        {
                             ApplicationUser applicationUser = UserManager.FindByName(model.Email);
                             await SignInManager.SignInAsync(applicationUser, isPersistent: false, rememberBrowser: false);
 
@@ -190,10 +275,14 @@ namespace DotNetThemeMVC.Controllers
                             {
                                 return Redirect(returnUrl);
                             }
-                            //If Signed in user is an administrator take them to the administrator home page
-                            else if (userRole.Equals("Administrators") || userRole.Equals("SuperAdmin"))
+                            //If Signed in user is in the role of Administrators or SuperAdmintake them to the administrator home page
+                            else if (UserManager.IsInRole(applicationUser.Id, "Administrators") || UserManager.IsInRole(applicationUser.Id, "SuperAdmin"))
                             {
                                 return RedirectToAction("Home", "Administrator");
+                            }
+                            else
+                            {
+                                return RedirectToAction("Index", "Home");
                             }
                         }
                         else
@@ -207,7 +296,7 @@ namespace DotNetThemeMVC.Controllers
                         ModelState.AddModelError("", "Login failed.");
                         return View(model);
                     }
-                }*/
+                }
 
                 //Normal user login and routing
                 var userid = UserManager.FindByEmail(model.Email).Id;
@@ -270,16 +359,31 @@ namespace DotNetThemeMVC.Controllers
             return callbackUrl;
         }
 
-        //
         // GET: /Account/Register
+        /// <summary>
+        /// Displays the Register Index
+        /// </summary>
+        /// <returns>View</returns>
         [AllowAnonymous]
         public ActionResult Register()
         {
-            return View();
+            if (ConfigurationManager.AppSettings["isInternal"].Equals("false"))
+            {
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Login", "Account");
+            }
         }
 
-        //
         // POST: /Account/Register
+        /// <summary>
+        /// Creates a new account for the supplied credentials. Sends off a confirmation email.
+        /// User cannot sign in until the link in the confirmation email is clicked.
+        /// </summary>
+        /// <param name="model">The register object</param>
+        /// <returns>View</returns>
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -289,25 +393,33 @@ namespace DotNetThemeMVC.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
-                    var result = await UserManager.CreateAsync(user, model.Password);
-                    if (result.Succeeded)
+                    if (ConfigurationManager.AppSettings["isInternal"].Equals("false"))
                     {
-                        string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                        var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                        var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                        var result = await UserManager.CreateAsync(user, model.Password);
+                        if (result.Succeeded)
+                        {
+                            string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+                            var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
 
-                        string emailText = "<p style=\"font-size:2em;padding-top:1em;padding-bottom:1em;padding-right:1em;padding-left:1em;line-height:150%;text-align:center;background-color:#7ac143 ;margin-top:auto;margin-bottom:auto;margin-right:auto;margin-left:auto;\" >" +
-                            "<a href=\"" + callbackUrl + "\" style=\"color:#fff;padding-top:1.3em;padding-bottom:1.3em;padding-right:1.3em;padding-left:1.3em;font-weight:bold;text-decoration:none;\" >Confirm my email address</a></p><br />" +
-                            "Thank you for registering for " + System.Web.Configuration.WebConfigurationManager.AppSettings["title"].ToString() + ". In order to proceed please <a href=\"" + callbackUrl + "\">confirm</a> your account. " +
-                            "If the link doesn't work copy and paste this link into your browser: " + callbackUrl + "<br />" +
-                            "<h2>Next Steps</h2><br />" +
-                            "Log in and complete the registration form for your child(ren).";
-                        Email email = new Email();
-                        email.SendEmail(user.Email, "Confirm your WRDSB " + System.Web.Configuration.WebConfigurationManager.AppSettings["title"].ToString() + " account : WRDSB", emailText);
+                            string emailText =
+                                "<p style=\"font-size:2em;padding-top:1em;padding-bottom:1em;padding-right:1em;padding-left:1em;line-height:150%;text-align:center;background-color:#7ac143 ;margin-top:auto;margin-bottom:auto;margin-right:auto;margin-left:auto;\" >" +
+                                "<a href=\"" + callbackUrl + "\" style=\"color:#fff;padding-top:1.3em;padding-bottom:1.3em;padding-right:1.3em;padding-left:1.3em;font-weight:bold;text-decoration:none;\" >Confirm my email address</a></p><br />" +
+                                "<p style='font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif;font-size: 14px;line-height: 150%;color: #333;background-color: #fff;margin: 0 10%;'>Thank you for registering for " + System.Web.Configuration.WebConfigurationManager.AppSettings["title"].ToString() + ". In order to proceed please <a href=\"" + callbackUrl + "\">confirm</a> your account." +
+                                "If the link doesn't work copy and paste this link into your browser: " + callbackUrl + "</p>" +
+                                "<h2>Next Steps</h2>" +
+                                "<p style='font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif;font-size: 14px;line-height: 150%;color: #333;background-color: #fff;margin: 0 10%;'>Log in and complete the registration form for your child(ren).</p>";
+                            Email email = new Email();
+                            email.SendEmail(user.Email, "Confirm your WRDSB " + System.Web.Configuration.WebConfigurationManager.AppSettings["title"].ToString() + " account : WRDSB", emailText);
 
-                        return View("EmailNotConfirmed");
+                            return View("EmailNotConfirmed");
+                        }
+                        AddErrors(result);
                     }
-                    AddErrors(result);
+                    else
+                    {
+                        return RedirectToAction("Login", "Account");
+                    }
                 }
 
                 // If we got this far, something failed, redisplay form
@@ -322,8 +434,13 @@ namespace DotNetThemeMVC.Controllers
             }
         }
 
-        //
         // GET: /Account/ConfirmEmail
+        /// <summary>
+        /// Verifies that the link sent in the email came from the email requesting account access.
+        /// </summary>
+        /// <param name="userId">The userid of the new registering user</param>
+        /// <param name="code">The code that was sent in the email</param>
+        /// <returns></returns>
         [AllowAnonymous]
         public async Task<ActionResult> ConfirmEmail(string userId, string code)
         {
@@ -335,16 +452,23 @@ namespace DotNetThemeMVC.Controllers
             return View(result.Succeeded ? "ConfirmEmail" : "Error");
         }
 
-        //
         // GET: /Account/ForgotPassword
+        /// <summary>
+        /// Displays the ForgotPassword view.
+        /// </summary>
+        /// <returns>View</returns>
         [AllowAnonymous]
         public ActionResult ForgotPassword()
         {
             return View();
         }
 
-        //
         // POST: /Account/ForgotPassword
+        /// <summary>
+        /// Sends a link allowing the user to reset the password.
+        /// </summary>
+        /// <param name="model">The ForgotPassword object</param>
+        /// <returns>View</returns>
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -380,24 +504,35 @@ namespace DotNetThemeMVC.Controllers
             return View(model);
         }
 
-        //
         // GET: /Account/ForgotPasswordConfirmation
+        /// <summary>
+        /// Displays View saying an email was sent and to check their inbox
+        /// </summary>
+        /// <returns>View</returns>
         [AllowAnonymous]
         public ActionResult ForgotPasswordConfirmation()
         {
             return View();
         }
 
-        //
         // GET: /Account/ResetPassword
+        /// <summary>
+        /// Displays the Reset Password page
+        /// </summary>
+        /// <param name="code">Code to verify</param>
+        /// <returns>View</returns>
         [AllowAnonymous]
         public ActionResult ResetPassword(string code)
         {
             return code == null ? View("Error") : View();
         }
 
-        //
         // POST: /Account/ResetPassword
+        /// <summary>
+        /// Resets the password
+        /// </summary>
+        /// <param name="model">The ResetPassword object</param>
+        /// <returns>View</returns>
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -422,18 +557,24 @@ namespace DotNetThemeMVC.Controllers
             return View();
         }
 
-        //
         // GET: /Account/ResetPasswordConfirmation
+        /// <summary>
+        /// Displays the reset password confirmation
+        /// </summary>
+        /// <returns>View</returns>
         [AllowAnonymous]
         public ActionResult ResetPasswordConfirmation()
         {
             return View();
         }
 
-        //
-        // POST: /Account/LogOff
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        //POST: /Account/LogOff
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        /// <summary>
+        /// Make a call to this to log off
+        /// </summary>
+        /// <returns>View</returns>
         public ActionResult LogOff()
         {
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);

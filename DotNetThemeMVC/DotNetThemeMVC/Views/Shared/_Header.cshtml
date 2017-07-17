@@ -5,30 +5,70 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <!-- Bootstrap -->
-<link href="https://s3.amazonaws.com/wrdsb-theme/css/bootstrap.css" rel="stylesheet" media="all">
-<link href="https://s3.amazonaws.com/wrdsb-theme/css/bootstrap-theme.css" rel="stylesheet">
-<link href="https://s3.amazonaws.com/wrdsb-theme/css/style.css" rel="stylesheet">
-<link href="https://s3.amazonaws.com/wrdsb-theme/css/icon-styles.css" rel="stylesheet">
+<link href="@(String.Format("{0}{1}{2}", "https://s3.amazonaws.com/wrdsb-ui-assets/",
+    @System.Web.Configuration.WebConfigurationManager.AppSettings["awsVersion"].ToString(),
+    "/css/bootstrap.css"))" rel="stylesheet" media="all" />
+<link href="@(String.Format("{0}{1}{2}", "https://s3.amazonaws.com/wrdsb-ui-assets/",
+    @System.Web.Configuration.WebConfigurationManager.AppSettings["awsVersion"].ToString(),
+    "/css/bootstrap-theme.css"))" rel="stylesheet" />
+<link href="@(String.Format("{0}{1}{2}", "https://s3.amazonaws.com/wrdsb-ui-assets/",
+    @System.Web.Configuration.WebConfigurationManager.AppSettings["awsVersion"].ToString(),
+    "/css/style.css"))" rel="stylesheet" />
 
-<link href="https://s3.amazonaws.com/wrdsb-theme/images/icon-60x60.png" rel="apple-touch-icon" />
-<link href="https://s3.amazonaws.com/wrdsb-theme/images/icon-76x76.png" rel="apple-touch-icon" sizes="76x76" />
-<link href="https://s3.amazonaws.com/wrdsb-theme/images/icon-120x120.png" rel="apple-touch-icon" sizes="120x120" />
-<link href="https://s3.amazonaws.com/wrdsb-theme/images/icon-152x152.png" rel="apple-touch-icon" sizes="152x152" />
+<link href="@(String.Format("{0}{1}{2}", "https://s3.amazonaws.com/wrdsb-ui-assets/",
+    @System.Web.Configuration.WebConfigurationManager.AppSettings["awsVersion"].ToString(),
+    "/css/icon-styles.css"))" rel="stylesheet" />
 
+<link href="@(String.Format("{0}{1}{2}", "https://s3.amazonaws.com/wrdsb-ui-assets/",
+    @System.Web.Configuration.WebConfigurationManager.AppSettings["awsVersion"].ToString(),
+    "/images/icon-60x60.png"))" rel="apple-touch-icon" />
+
+<link href="@(String.Format("{0}{1}{2}", "https://s3.amazonaws.com/wrdsb-ui-assets/",
+    @System.Web.Configuration.WebConfigurationManager.AppSettings["awsVersion"].ToString(),
+    "/images/icon-76x76.png"))" rel="apple-touch-icon" sizes="76x76" />
+
+<link href="@(String.Format("{0}{1}{2}", "https://s3.amazonaws.com/wrdsb-ui-assets/",
+    @System.Web.Configuration.WebConfigurationManager.AppSettings["awsVersion"].ToString(),
+    "/images/icon-120x120.png"))" rel="apple-touch-icon" sizes="120x120" />
+
+<link href="@(String.Format("{0}{1}{2}", "https://s3.amazonaws.com/wrdsb-ui-assets/",
+    @System.Web.Configuration.WebConfigurationManager.AppSettings["awsVersion"].ToString(),
+    "/images/icon-152x152.png"))" rel="apple-touch-icon" sizes="152x152" />   
+<!--
+<script type='text/javascript' src="@(String.Format("{0}{1}{2}", "https://s3.amazonaws.com/wrdsb-ui-assets/",
+    @System.Web.Configuration.WebConfigurationManager.AppSettings["awsVersion"].ToString(),
+    "/jquery/jquery-migrate.min.js"))"></script>-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-migrate/3.0.0/jquery-migrate.js"></script>
 
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
-        integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
+<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"
+        integrity="sha256-0YPKAwZP7Mp3ALMRVB2i8GXeEndvCq3eSl/WsAl1Ryk="
         crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.js"
+        integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE="
+        crossorigin="anonymous"></script>
+<script src="@(String.Format("{0}{1}{2}", "https://s3.amazonaws.com/wrdsb-ui-assets/",
+    @System.Web.Configuration.WebConfigurationManager.AppSettings["awsVersion"].ToString(),
+    "/jquery/jquery.datetimepicker.js"))"></script>
+<link href="@(String.Format("{0}{1}{2}", "https://s3.amazonaws.com/wrdsb-ui-assets/",
+    @System.Web.Configuration.WebConfigurationManager.AppSettings["awsVersion"].ToString(),
+    "/css/jquery/jquery.datetimepicker.css"))" rel="stylesheet">  
+
 <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 
 <!-- Add to Home Screen Button -->
-
-<link href="https://s3.amazonaws.com/wrdsb-theme/css/addtohomescreen.css" rel="stylesheet">
-<script src="https://s3.amazonaws.com/wrdsb-theme/js/addtohomescreen.min.js"></script>
-<script src="https://s3.amazonaws.com/wrdsb-theme/js/jquery/jquery.floatThead.min.js"></script>
+<link href="@(String.Format("{0}{1}{2}", "https://s3.amazonaws.com/wrdsb-ui-assets/",
+    @System.Web.Configuration.WebConfigurationManager.AppSettings["awsVersion"].ToString(),
+    "/css/addtohomescreen.css"))" rel="stylesheet">
+<script src="@(String.Format("{0}{1}{2}", "https://s3.amazonaws.com/wrdsb-ui-assets/",
+    @System.Web.Configuration.WebConfigurationManager.AppSettings["awsVersion"].ToString(),
+    "/js/addtohomescreen.min.js"))"></script>
+<script src="@(String.Format("{0}{1}{2}", "https://s3.amazonaws.com/wrdsb-ui-assets/",
+    @System.Web.Configuration.WebConfigurationManager.AppSettings["awsVersion"].ToString(),
+    "/jquery/jquery.floatThead.min.js"))"></script>
 
 <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -59,11 +99,11 @@
     $("table").wrap("<div class='table-responsive'></div>");
 </script>
 
-<script type='text/javascript' src='https://s3.amazonaws.com/wrdsb-theme/js/jquery/jquery.js?ver=1.12.4'></script>
-<script type='text/javascript' src='https://s3.amazonaws.com/wrdsb-theme/js/jquery/jquery-migrate.min.js?ver=1.4.1'></script>
 
 <!-- Favicon -->
-<link rel="shortcut icon" type="image/png" href="https://s3.amazonaws.com/wrdsb-theme/favicon.png" />
+<link rel="shortcut icon" type="image/png" href="@(String.Format("{0}{1}{2}", "https://s3.amazonaws.com/wrdsb-ui-assets/",
+    @System.Web.Configuration.WebConfigurationManager.AppSettings["awsVersion"].ToString(),
+    "/images/favicon.png"))" />  >
 
 <!-- Google Analytics
 <script type="text/javascript">
@@ -88,6 +128,18 @@
     ga('create', '@System.Web.Configuration.WebConfigurationManager.AppSettings["googleAnalytics"].ToString()', 'auto');
     ga('send', 'pageview');
 </script>
+-->
+<!-- Application Insights
+<script type="text/javascript">
+    var appInsights = window.appInsights || function (config) {
+        function i(config) { t[config] = function () { var i = arguments; t.queue.push(function () { t[config].apply(t, i) }) } } var t = { config: config }, u = document, e = window, o = "script", s = "AuthenticatedUserContext", h = "start", c = "stop", l = "Track", a = l + "Event", v = l + "Page", y = u.createElement(o), r, f; y.src = config.url || "https://az416426.vo.msecnd.net/scripts/a/ai.0.js"; u.getElementsByTagName(o)[0].parentNode.appendChild(y); try { t.cookie = u.cookie } catch (p) { } for (t.queue = [], t.version = "1.0", r = ["Event", "Exception", "Metric", "PageView", "Trace", "Dependency"]; r.length;) i("track" + r.pop()); return i("set" + s), i("clear" + s), i(h + a), i(c + a), i(h + v), i(c + v), i("flush"), config.disableExceptionTracking || (r = "onerror", i("_" + r), f = e[r], e[r] = function (config, i, u, e, o) { var s = f && f(config, i, u, e, o); return s !== !0 && t["_" + r](config, i, u, e, o), s }), t
+    }({
+        instrumentationKey: "@System.Web.Configuration.WebConfigurationManager.AppSettings["applicationInsights"].ToString()"
+    });
+
+    window.appInsights = appInsights;
+    appInsights.trackPageView();
+</script>    
 -->
 
 <!--
@@ -153,15 +205,16 @@
 
         <div class="collapse navbar-collapse">
             <ul id="menu-top-menu" class="nav nav-justified">
-                <li id="home_link" class="menu-item current-menu-item current_page_item menu-item-home"><a title="Take me to the home page" href="Default.aspx">Home</a></li>
+                <li id="home_link" class="menu-item current-menu-item current_page_item menu-item-home"><a title="Take me to the home page" href="@Url.Action("Home", "Index")">Home</a></li>
                 @if (User.IsInRole("Administrators") || User.IsInRole("SuperAdmin"))
                 {
-                    <li id="admin_link" class="menu-item menu-item-type-post_type menu-item-object-page"><a title="Take me to the admin page" href="@Url.Action("Index", "Administrator")">Administrators</a></li>
+                    <li id="admin_link" class="menu-item menu-item-type-post_type menu-item-object-page"><a title="Take me to the admin page" href="@Url.Action("Home", "Administrator")">Administrators</a></li>
                 }
+                <!--
                 else
                 {
                     <li id="form_link" class="menu-item menu-item-type-post_type menu-item-object-page"><a title="Take me to the forms page" href="@Url.Action("Index", "Form")">Registration Form</a></li>
-                }
+                }-->
             </ul>
         </div>
     </div><!-- /.navbar -->

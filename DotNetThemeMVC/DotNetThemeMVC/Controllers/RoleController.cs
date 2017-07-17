@@ -9,12 +9,29 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using DotNetThemeMVC.Models;
+using Microsoft.AspNet.Identity.Owin;
+using Microsoft.Owin.Security;
+using Microsoft.AspNet.Identity;
+using DotNetThemeMVC;
 
 namespace WebApplication1.Controllers
 {
     public class RoleController : Controller
-    {/*
+    {
         private ApplicationDbContext db = new ApplicationDbContext();
+
+        private ApplicationUserManager _userManager;
+        public ApplicationUserManager UserManager
+        {
+            get
+            {
+                return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
+            }
+            private set
+            {
+                _userManager = value;
+            }
+        }
 
         /// <summary>
         /// Returns an IdentityRole object based on an id.
@@ -134,21 +151,11 @@ namespace WebApplication1.Controllers
             if (ModelState.IsValid)
             {
                 var roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(new ApplicationDbContext()));
-                boardUsersEntities db = new boardUsersEntities();
-
-                string currentRoleName = roleManager.FindById(roleViewModels.id).Name;
-                List<board_users> board_users = db.board_users.Where(x => x.role == currentRoleName).ToList();
 
                 IdentityRole role = roleManager.FindById(roleViewModels.id);
                 role.Name = roleViewModels.Name;
-
                 roleManager.Update(role);
 
-                //Update the board_users table with the new name
-                foreach (var board_user in board_users)
-                {
-                    board_user.role = role.Name;
-                }
                 db.SaveChanges();
 
                 return RedirectToAction("Index");
@@ -204,18 +211,17 @@ namespace WebApplication1.Controllers
 
             IdentityRole role = getIdentityRole(id);
 
-            boardUsersEntities db = new boardUsersEntities();
-            List<board_users> board_users = db.board_users.ToList();
+            var users = UserManager.Users.Where(x => !x.UserName.Contains("@")).ToList();
+            var roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(new ApplicationDbContext()));
+            var roleUsers = roleManager.Roles.Single(x => x.Name.Equals(role.Name)).Users;
+            users = (from r in roleUsers join u in users on r.UserId equals u.Id select u).Distinct().ToList();
 
             bool roleIsAssigned = false;
-            int roleCount = 0;
-            foreach (var board_user in board_users)
+            int roleCount = users.Count;
+
+            if(roleCount > 0)
             {
-                if (board_user.role.Equals(role.Name))
-                {
-                    roleIsAssigned = true;
-                    roleCount += 1;
-                }
+                roleIsAssigned = true;
             }
 
             //Assign the Identity Roles
@@ -230,15 +236,11 @@ namespace WebApplication1.Controllers
 
             if (roleIsAssigned)
             {
-                ModelState.AddModelError("", "Cannot remove a Role that " + roleCount + " users are assigned to.");
+                ModelState.AddModelError(roleViewModels.Name, "Cannot remove a Role that " + roleCount + " users are assigned to.");
                 return View(roleViewModels);
             }
             else
             {
-                var roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(new ApplicationDbContext()));
-                //If I try to remove using 'role' defined earlier an error happens on roleManager.Delete:
-                //The object cannot be deleted because it was not found in the ObjectStateManager.
-                //This work around works
                 var roleToDelete = roleManager.FindByName(role.Name);
                 roleManager.Delete(roleToDelete);
 
@@ -253,6 +255,6 @@ namespace WebApplication1.Controllers
                 db.Dispose();
             }
             base.Dispose(disposing);
-        }*/
+        }
     }
 }

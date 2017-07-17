@@ -1,0 +1,49 @@
+﻿@model IEnumerable<DotNetThemeMVC.Models.ADGroupRolesViewModel>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Active Directory Group Authorization Management</h1>
+
+<div class="alert alert-warning">
+    Depending on the number of users per group: creating, editing, or deleting their accounts or permissions may take a while.
+</div>
+<p>
+    Manage which Active Directory Groups are authorized into this application and what roles the users of those groups recieve.
+</p>
+<div style="padding-top: 50px;">
+    <table class="table table-condensed">
+        <tr>
+            <th>
+                Active Directory Group
+            </th>
+            <th>
+                Role
+            </th>
+            <th>
+                Manage Groups @Html.ActionLink("(+)", "Create", null, htmlAttributes: new { @style = "color:green" })
+            </th>
+        </tr>
+
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td class="text-center">
+                    @Html.DisplayFor(modelItem => item.groupName)
+                </td>
+                <td class="text-center">
+                    @foreach (var role in item.groupRoles)
+                    {
+                        @Html.DisplayFor(modelItem => role) @:
+                }
+                </td>
+                <td class="text-center">
+                    @Html.ActionLink("Edit", "Edit", new { id = item.groupName }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.groupName })
+                </td>
+            </tr>
+        }
+    </table>
+</div>

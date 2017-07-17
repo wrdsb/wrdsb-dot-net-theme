@@ -9,6 +9,7 @@ using System.Web.Security;
 using DotNetThemeMVC.Models;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace DotNetThemeMVC.Controllers
 {
@@ -76,20 +77,18 @@ namespace DotNetThemeMVC.Controllers
             try
             {
                 ApplicationUserManager UserManager = System.Web.HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>();
+                var roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(new ApplicationDbContext()));
 
                 //Get a list of administrator usernames from the board users table
-                boardUsersEntities db = new boardUsersEntities();
-                List<board_users> administrators = new List<board_users>();
-                administrators = db.board_users.Where(x => x.role == "Administrators").ToList();
+                var roleUsers = roleManager.Roles.Single(x => x.Name.Equals("Administrators")).Users;
+                var users = UserManager.Users.Where(x => !x.UserName.Contains("@")).ToList();
+                users = (from r in roleUsers join u in users on r.UserId equals u.Id select u).Distinct().ToList();
 
                 //For each username, find the identity account and use it's email column in the call to SendMail function
-                foreach (var admin in administrators)
+                foreach (var admin in users)
                 {
-                    //Find the Identity account based on admin username
-                    var user = UserManager.FindByName(admin.username);
-
                     //Call Email Function
-                    SendEmail(user.Email, subject, message);
+                    SendEmail(admin.Email, subject, message);
                 }
             }
             catch (Exception ex)
@@ -110,20 +109,18 @@ namespace DotNetThemeMVC.Controllers
             try
             {
                 ApplicationUserManager UserManager = System.Web.HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>();
+                var roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(new ApplicationDbContext()));
 
-                //Get a list of superadmin usernames from the board users table
-                boardUsersEntities db = new boardUsersEntities();
-                List<board_users> superadmins = new List<board_users>();
-                superadmins = db.board_users.Where(x => x.role == "SuperAdmins").ToList();
+                //Get a list of super administrator usernames from the board users table
+                var roleUsers = roleManager.Roles.Single(x => x.Name.Equals("SuperAdmin")).Users;
+                var users = UserManager.Users.Where(x => !x.UserName.Contains("@")).ToList();
+                users = (from r in roleUsers join u in users on r.UserId equals u.Id select u).Distinct().ToList();
 
                 //For each username, find the identity account and use it's email column in the call to SendMail function
-                foreach (var superadmin in superadmins)
+                foreach (var admin in users)
                 {
-                    //Find the Identity account based on admin username
-                    var user = UserManager.FindByName(superadmin.username);
-
                     //Call Email Function
-                    SendEmail(user.Email, subject, message);
+                    SendEmail(admin.Email, subject, message);
                 }
             }
             catch (Exception ex)
@@ -144,18 +141,16 @@ namespace DotNetThemeMVC.Controllers
             try
             {
                 ApplicationUserManager UserManager = System.Web.HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>();
+                var roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(new ApplicationDbContext()));
 
-                //Get a list of usernames with a specified role from the board users table
-                boardUsersEntities db = new boardUsersEntities();
-                List<board_users> board_users = new List<board_users>();
-                board_users = db.board_users.Where(x => x.role == role).ToList();
+                //Get a list of administrator usernames from the board users table
+                var roleUsers = roleManager.Roles.Single(x => x.Name.Equals(role)).Users;
+                var users = UserManager.Users.Where(x => !x.UserName.Contains("@")).ToList();
+                users = (from r in roleUsers join u in users on r.UserId equals u.Id select u).Distinct().ToList();
 
                 //For each username, find the identity account and use it's email column in the call to SendMail function
-                foreach (var board_user in board_users)
+                foreach (var user in users)
                 {
-                    //Find the Identity account based on admin username
-                    var user = UserManager.FindByName(board_user.username);
-
                     //Call Email Function
                     SendEmail(user.Email, subject, message);
                 }

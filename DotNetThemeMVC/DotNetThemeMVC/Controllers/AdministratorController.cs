@@ -7,7 +7,7 @@ using System.Web.Mvc;
 namespace DotNetThemeMVC.Controllers
 {
     public class AdministratorController : Controller
-    {/*
+    {
         // GET: Administrator/Home
         /// <summary>
         /// Displays the Administrator Home page. Providing quick links to perform all administrator actios.
@@ -18,7 +18,7 @@ namespace DotNetThemeMVC.Controllers
         {
             return View();
         }
-        */
+        
         //Add additional Administratior Views here
     }
 }

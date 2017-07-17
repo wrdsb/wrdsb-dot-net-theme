@@ -1,0 +1,72 @@
+﻿@model DotNetThemeMVC.Models.ADGroupRolesViewModel
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="https://s3.amazonaws.com/wrdsb-theme/css/ui/jquery-ui.css" rel="stylesheet" />
+<link href="https://s3.amazonaws.com/wrdsb-theme/css/ui/jquery.ui.base.css" rel="stylesheet" />
+<link href="https://s3.amazonaws.com/wrdsb-theme/css/ui/jquery.ui.theme.css" rel="stylesheet" />
+<link href="https://s3.amazonaws.com/wrdsb-theme/css/ui/jquery.ui.datepicker.css" rel="stylesheet" />
+<link href="https://s3.amazonaws.com/wrdsb-theme/css/ui/jquery.ui.autocomplete.css" rel="stylesheet" />
+<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"
+        integrity="sha256-0YPKAwZP7Mp3ALMRVB2i8GXeEndvCq3eSl/WsAl1Ryk="
+        crossorigin="anonymous"></script>
+
+<script>
+    $(document).ready(function () {
+        $("#searchTerms").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: '@Url.Action("getADGroups", "UserRole")',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: { search: request.term },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            return { label: item.value, value: item.value };
+                        }));
+                    }
+                });
+            },
+            select: function (event, ui) {
+                $("searchTerms").val(ui.item.label);
+                document.getElementById("adGroupName").value = ui.item.label;
+            }
+        });
+    });
+</script>
+
+<h2>Authorize a Group</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.groupName, new { id = "adGroupName"})
+    @Html.Partial("_ValidationSummary", ViewData.ModelState)
+
+    <fieldset>
+        <legend>Active Directory Group Permissions</legend>
+        <div class="col-md-3">
+            <div class="form-group">
+                @Html.LabelFor(model => model.groupName, "Active Directory Group Name")
+                @Html.TextBoxFor(model => model.groupName, new { id = "searchTerms", Name = "searchTerms", placeholder = "Group Name", @class = "form-inline" })
+                @Html.ValidationMessageFor(model => model.groupName, "", new { @class = "text-danger" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.groupRoles, "Role")
+                @Html.ListBoxFor(model => model.groupRoles, new SelectList(Model.allRoles), new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.groupRoles, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </fieldset>
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" class="btn btn-default" />
+        </div>
+    </div>
+}
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
