@@ -4,7 +4,6 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!--<link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet" />-->
 <link href="https://s3.amazonaws.com/wrdsb-theme/css/ui/jquery-ui.css" rel="stylesheet" />
 <link href="https://s3.amazonaws.com/wrdsb-theme/css/ui/jquery.ui.base.css" rel="stylesheet" />
 <link href="https://s3.amazonaws.com/wrdsb-theme/css/ui/jquery.ui.theme.css" rel="stylesheet" />
@@ -61,9 +60,7 @@
             </div>
         </div>
     </fieldset>
-    <div>
-        @Html.TextBox("searchTerms", null, htmlAttributes: new { placeholder = "Group Name", @class = "form-inline" })
-    </div>
+
     <div class="form-group">
         <div class="col-md-offset-2 col-md-10">
             <input type="submit" class="btn btn-default" />

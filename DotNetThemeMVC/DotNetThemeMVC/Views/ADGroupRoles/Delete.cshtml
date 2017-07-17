@@ -4,11 +4,12 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Delete the AD Group Permissions</h2>
+<h2>Delete the ACtive Directory Group and Roles</h2>
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
     @Html.Hidden(Model.groupName)
+    @Html.Partial("_ValidationSummary", ViewData.ModelState)
 
     <fieldset>
         <legend>Active Directory Group Permissions</legend>

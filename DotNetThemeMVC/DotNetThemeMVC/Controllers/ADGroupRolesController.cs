@@ -55,7 +55,7 @@ namespace DotNetThemeMVC.Controllers
         /// <summary>
         /// Checks to see if the currently signed in user is in the Administrator Role
         /// </summary>
-        /// <returns>bool</returns>
+        /// <returns>boolean</returns>
         public bool isAdministrator()
         {
             var userId = User.Identity.GetUserId();
@@ -81,7 +81,7 @@ namespace DotNetThemeMVC.Controllers
         }
 
         /// <summary>
-        /// Returns the administrators email address from AD
+        /// Returns the users email address from Active Directory
         /// </summary>
         /// <param name="username">The input value for username</param>
         /// <returns>string</returns>
@@ -107,9 +107,9 @@ namespace DotNetThemeMVC.Controllers
         }
 
         /// <summary>
-        /// Gets a list of PAL usernames that belong to an active directory group name
+        /// Gets a list of PAL usernames that belong to an Active Directory group name
         /// </summary>
-        /// <param name="adGroupName">The active directory group name</param>
+        /// <param name="adGroupName">The input value for active directory group name</param>
         /// <returns>List<string></returns>
         public List<string> GetADAccounts(string adGroupName)
         {
@@ -136,6 +136,12 @@ namespace DotNetThemeMVC.Controllers
             return accounts;
         }
 
+        /// <summary>
+        /// Checks to see if a username is a member of a Active Directory gruop
+        /// </summary>
+        /// <param name="account">The input value for username</param>
+        /// <param name="adGroup">The input value for active directory group name</param>
+        /// <returns>boolean</returns>
         public bool IsMemberOfADGroup(string account, string adGroup)
         {
             PrincipalContext context = new PrincipalContext(ContextType.Domain, WebConfigurationManager.AppSettings["adAuthURL"].ToString());
@@ -149,6 +155,13 @@ namespace DotNetThemeMVC.Controllers
             return false;
         }
 
+        /// <summary>
+        /// Checks to see if a pending role to be removed for a user is granted from the Active Directory Group
+        /// </summary>
+        /// <param name="account">The input value for username</param>
+        /// <param name="removedRole">The input value for the removed role</param>
+        /// <param name="groupName">The input value for the active directory group name</param>
+        /// <returns>boolean</returns>
         public bool IsPermissionedByGroupToEdit(string account, string removedRole, string groupName)
         {
             //List<string> adGroupNames = db.ad_group_roles.Select(x => x.group_name).Distinct().ToList();
@@ -169,6 +182,13 @@ namespace DotNetThemeMVC.Controllers
             return false;
         }
 
+        /// <summary>
+        /// Checks to see if a pending role to be removed for a user is granted from any Active Directory Group
+        /// </summary>
+        /// <param name="account">The input value for username</param>
+        /// <param name="removedRole">The input value for the removed role</param>
+        /// <param name="excludeGroup">The input value for the active directory group name</param>
+        /// <returns>boolean</returns>
         public bool IsPermissionedByOtherGroups(string account, string removedRole, string excludeGroup)
         {
             List<string> adGroupNames = db.ad_group_roles.Select(x => x.group_name).Distinct().ToList();
@@ -226,7 +246,7 @@ namespace DotNetThemeMVC.Controllers
             model.allRoles = allRoles;
             return View(model);
         }
-
+        //POST: ADGroupRoles/Create
         /// <summary>
         /// Authorizes an Active Directory Group to the Application.
         /// Creates identity accounts for members of Active Directory Group if needed.
@@ -327,7 +347,7 @@ namespace DotNetThemeMVC.Controllers
         [Authorize(Roles = "SuperAdmin,Administrators")]
         public ActionResult Edit(string id)
         {
-            //No Paremeter
+            //No Parameter
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -351,6 +371,12 @@ namespace DotNetThemeMVC.Controllers
             return View(model);
         }
 
+        //POST: ADGroupRoles/Edit
+        /// <summary>
+        /// Updates the roles associated with an Active Directory Group and all the associated user accounts.
+        /// </summary>
+        /// <param name="adGroupRolesViewModel">The Active Directory Group Model to edit</param>
+        /// <returns>View</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "SuperAdmin,Administrators")]
@@ -462,6 +488,12 @@ namespace DotNetThemeMVC.Controllers
             }
         }
 
+        //GET: ADGroupRoles/Delete
+        /// <summary>
+        /// Displays the Delete page allowing an administrator to delete an Active Directory Group and Roles.
+        /// </summary>
+        /// <param name="id">The input value for the Active Directory Group</param>
+        /// <returns>View</returns>
         [Authorize(Roles = "SuperAdmin,Administrators")]
         public ActionResult Delete(string id)
         {
@@ -488,6 +520,12 @@ namespace DotNetThemeMVC.Controllers
             return View(model);
         }
 
+        //POST: ADGroupRoles/Delete
+        /// <summary>
+        /// Deletes the Active Directory Group and Roles, and all the associated user accounts if they have no roles.
+        /// </summary>
+        /// <param name="id">The input value for the Active Directory Group</param>
+        /// <returns>View</returns>
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "SuperAdmin,Administrators")]
@@ -558,10 +596,13 @@ namespace DotNetThemeMVC.Controllers
                 error.handleError(ex, "Exception occured during Group Authorization.");
                 ModelState.AddModelError(string.Empty, "There was a problem when attempting to delete a group. We are aware of the issue and will investigate. Please try permissioning a group again. If the issue continues contact an Administrator.");
 
-                return View("Error");
+                return View(id);
             }
         }
 
+        /// <summary>
+        /// Json class for the Active Directory name look up function
+        /// </summary>
         public class JsonResults
         {
             public string id { get; set; }
@@ -569,6 +610,11 @@ namespace DotNetThemeMVC.Controllers
             public string value { get; set; }
         }
 
+        /// <summary>
+        /// Searches Active Directory group names and returns top 5 results
+        /// </summary>
+        /// <param name="search">The input value for searching Active Directory Group names</param>
+        /// <returns>Json</returns>
         [HttpPost]
         public ActionResult getADGroups(string search)
         {
@@ -591,430 +637,11 @@ namespace DotNetThemeMVC.Controllers
                 {
                     break;
                 }
-                //results.Add(found.Name);
-                //result.Add(new KeyValuePair<string, string>(found.Name, found.Name));
                 list.Add(new JsonResults { id = count.ToString(), label = found.Name, value = found.Name });
                 count += 1;
             }
 
             return Json(list, JsonRequestBehavior.AllowGet);
         }
-
-
-        //some reference code
-        /*
-         using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
-using System.Linq;
-using System.Net;
-using System.Web;
-using System.Web.Mvc;
-using DotNetThemeMVC.Models;
-using System.DirectoryServices.AccountManagement;
-using System.Web.Configuration;
-using Microsoft.AspNet.Identity.Owin;
-using Microsoft.Owin.Security;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
-
-namespace DotNetThemeMVC.Controllers
-{
-    public class ADGroupRolesController : Controller
-    {
-        private ApplicationDbContext db = new ApplicationDbContext();
-        private ApplicationUserManager _userManager;
-        public ApplicationUserManager UserManager
-        {
-            get
-            {
-                return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
-            }
-            private set
-            {
-                _userManager = value;
-            }
-        }
-
-        // GET: ADGroupRoles
-        public ActionResult Index()
-        {
-            return View(db.ad_group_roles.ToList());
-        }
-
-        // GET: ADGroupRoles/Create
-        public ActionResult Create()
-        {
-            List<string> allRoles = getRoleNames();
-            ViewBag.userRoles = new SelectList(allRoles);
-            return View();
-        }
-
-        /// <summary>
-        /// Gets the list of roles based on admin or superadmin status
-        /// </summary>
-        /// <returns>List<string></returns>
-        public List<string> getRoleNames()
-        {
-            var roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(new ApplicationDbContext()));
-            List<string> roles = roleManager.Roles.Select(x => x.Name).ToList();
-
-            if (isAdministrator())
-            {
-                roles.Remove("SuperAdmin");
-                return roles;
-            }
-            else
-            {
-                return roles;
-            }
-        }
-
-        /// <summary>
-        /// Checks to see if the currently signed in user is in the Administrator Role
-        /// </summary>
-        /// <returns>bool</returns>
-        public bool isAdministrator()
-        {
-            var userId = User.Identity.GetUserId();
-            if (UserManager.IsInRole(userId, "Administrators") && !UserManager.IsInRole(userId, "SuperAdmin"))
-            {
-                return true;
-            }
-            return false;
-        }
-
-        public List<string> GetADAccounts(string adGroupName)
-        {
-            List<string> accounts = new List<string>();
-
-            PrincipalContext ctx = new PrincipalContext(ContextType.Domain, WebConfigurationManager.AppSettings["adAuthURL"].ToString());
-            GroupPrincipal group = GroupPrincipal.FindByIdentity(ctx, adGroupName);
-
-            if(group != null)
-            {
-                foreach(Principal p in group.GetMembers())
-                {
-                    //UserPrincipal user = p as UserPrincipal;
-                    if(p != null)
-                    {
-                        accounts.Add(p.SamAccountName.ToLower());
-                    }
-                }
-            }
-            return accounts;
-        }
-
-        /// <summary>
-        /// Returns the administrators email address from AD
-        /// </summary>
-        /// <param name="username">The input value for username</param>
-        /// <returns>string</returns>
-        public string GetADEmail(string username)
-        {
-            PrincipalContext context = new PrincipalContext(ContextType.Domain, WebConfigurationManager.AppSettings["adAuthURL"].ToString());
-            UserPrincipal user = UserPrincipal.FindByIdentity(context, username);
-            return user.EmailAddress;
-        }
-
-        /// <summary>
-        /// Checks to see if an Account Exists for the supplied username
-        /// </summary>
-        /// <param name="username">The input value for username</param>
-        /// <returns>boolean</returns>
-        public bool accountExists(string username)
-        {
-            if (UserManager.FindByName(username) != null)
-            {
-                return true;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Creates an account for the supplied username
-        /// </summary>
-        /// <param name="username">The input value for username</param>
-        public void createAccount(string username)
-        {
-            string email = GetADEmail(username);
-            if (!String.IsNullOrEmpty(email))
-            {
-                var user = new ApplicationUser { UserName = username, Email = GetADEmail(username), EmailConfirmed = true };
-                UserManager.Create(user);
-            }
-        }
-
-        // POST: ADGroupRoles/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles="SuperAdmin,Administrators")]
-        public ActionResult Create([Bind(Include = "id,group_name,roles")] ad_group_roles ad_group_roles, List<string> selectedRoles)
-        {
-            try
-            {
-                if (ModelState.IsValid)
-                {
-                    List<string> allRoles = getRoleNames();
-                    ViewBag.userRoles = new SelectList(allRoles);
-
-                    //Check to see if the AD Group Name already exists in the database
-                    ad_group_roles existing = db.ad_group_roles.Where(x => x.group_name == ad_group_roles.group_name).FirstOrDefault();
-                    if (existing != null)
-                    {
-                        ModelState.AddModelError(ad_group_roles.group_name, "AD Group already has Roles associated to it. Edit the record.");
-                        return View(ad_group_roles);
-                    }
-
-                    //Get a list of all the accounts that belong to the selected AD Group Name
-                    List<string> accounts = GetADAccounts(ad_group_roles.group_name);
-                    if (accounts == null)
-                    {
-                        ModelState.AddModelError(ad_group_roles.group_name, "Failed to retrieve users belonging to the AD Group.");
-                        return View(ad_group_roles);
-                    }
-
-                    foreach (string account in accounts)
-                    {
-                        bool userExists = accountExists(account);
-                        if (!userExists)
-                        {
-                            createAccount(account);
-                        }
-                        if (selectedRoles != null && accountExists(account))
-                        {
-                            var userId = UserManager.FindByName(account).Id;
-
-                            foreach (var role in selectedRoles)
-                            {
-                                if (!UserManager.IsInRole(userId, role))
-                                {
-                                    UserManager.AddToRole(userId, role);
-                                }
-                            }
-                        }
-                    }
-
-                    foreach (var role in selectedRoles)
-                    {//should add several rows to table
-                        ad_group_roles ad = new ad_group_roles();
-                        ad.group_name = ad_group_roles.group_name;
-                        ad.role_name = role;
-                        db.ad_group_roles.Add(ad);
-                    }
-                    //go through each role and add to ad group and save
-                    //db.ad_group_roles.Add(ad_group_roles);
-                    db.SaveChanges();
-                    return RedirectToAction("Index");
-                }
-                return View(ad_group_roles);
-            }
-            catch (Exception ex)
-            {
-                Error error = new Error();
-                error.handleError(ex, "Exception occured during Account Creation.");
-                ModelState.AddModelError(string.Empty, "There was a problem when attempting to create an account. We are aware of the issue and will investigate. Please try creating an account again. If the issue continues contact an Administrator.");
-                return View(ad_group_roles);
-            }
-        }
-
-        // GET: ADGroupRoles/Edit/5
-        public ActionResult Edit(string ADGroup)
-        {
-            if (ADGroup == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            ad_group_roles ad_group_roles = db.ad_group_roles.Where(x => x.group_name == ADGroup).FirstOrDefault();
-            if (ad_group_roles == null)
-            {
-                return HttpNotFound();
-            }
-            List<string> allRoles = getRoleNames();
-            ViewBag.userRoles = new SelectList(allRoles);
-            return View(db.ad_group_roles.Where(x => x.group_name == ADGroup).ToList());
-        }
-
-        // POST: ADGroupRoles/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "id,group_name,roles")] ad_group_roles ad_group_roles)
-        {
-            if (ModelState.IsValid)
-            {
-                db.Entry(ad_group_roles).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            return View(ad_group_roles);
-        }
-
-        // GET: ADGroupRoles/Delete/5
-        public ActionResult Delete(string ADGroup)
-        {
-            if (ADGroup == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            ad_group_roles ad_group_roles = db.ad_group_roles.Where(x => x.group_name == ADGroup).FirstOrDefault();
-            if (ad_group_roles == null)
-            {
-                return HttpNotFound();
-            }
-            //Get this far at least one group -> role association exists, find the others if they exist
-            return View(db.ad_group_roles.Where(x => x.group_name == ADGroup).ToList());
-        }
-
-        public List<String> GetADGroupRoles(string ADGroup)
-        {
-            List<string> allRoles = new List<string>();
-            allRoles = db.ad_group_roles.Where(x => x.group_name == ADGroup).Select(z => z.role_name).ToList();
-            return  allRoles;
-        }
-
-        // POST: ADGroupRoles/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(string ADGroup)
-        {
-            //Get a list of all the accounts that belong to the selected AD Group Name
-            List<string> accounts = GetADAccounts(ADGroup);
-            if (accounts == null)
-            {
-                ModelState.AddModelError("", "Failed to retrieve users belonging to the AD Group.");
-                return View();
-            }
-
-            List<string> groupRoles = GetADGroupRoles(ADGroup);
-
-            foreach (string account in accounts)
-            {
-                bool userExists = accountExists(account);
-                if (userExists)
-                {
-                    if (groupRoles != null)
-                    {
-                        var userId = UserManager.FindByName(account).Id;
-
-                        foreach (var role in groupRoles)
-                        {
-                            if (UserManager.IsInRole(userId, role))
-                            {
-                                UserManager.RemoveFromRole(userId, role);
-                            }
-                        }
-                        if(UserManager.GetRoles(userId).Count() == 0)
-                        {
-                            ApplicationUser applicationUser = UserManager.FindById(userId);
-                            UserManager.Delete(applicationUser);
-                        }
-                    }
-                }
-            }
-
-            //not sure if this will delete all entries, test???
-            foreach (var role in groupRoles)
-            {
-                ad_group_roles ad_group_roles = db.ad_group_roles.Where(x => x.role_name == role).FirstOrDefault();
-                db.ad_group_roles.Remove(ad_group_roles);
-            }
-            db.SaveChanges();
-            return RedirectToAction("Index");
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                db.Dispose();
-            }
-            base.Dispose(disposing);
-        }
-    }
-}
-         */
-
-        //ajax to get adgroup names as you type view code/controller code
-        /*
-        <!--<link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet" />-->
-<link href="https://s3.amazonaws.com/wrdsb-theme/css/ui/jquery-ui.css" rel="stylesheet" />
-<link href="https://s3.amazonaws.com/wrdsb-theme/css/ui/jquery.ui.base.css" rel="stylesheet" />
-<link href="https://s3.amazonaws.com/wrdsb-theme/css/ui/jquery.ui.theme.css" rel="stylesheet" />
-<link href="https://s3.amazonaws.com/wrdsb-theme/css/ui/jquery.ui.datepicker.css" rel="stylesheet" />
-<link href="https://s3.amazonaws.com/wrdsb-theme/css/ui/jquery.ui.autocomplete.css" rel="stylesheet" />
-<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"
-        integrity="sha256-0YPKAwZP7Mp3ALMRVB2i8GXeEndvCq3eSl/WsAl1Ryk="
-        crossorigin="anonymous"></script>
-        <!--document.getElementById("searchTerms").value = ui.item.id;-->
-<script>
-    $(document).ready(function () {
-        $("#searchTerms").autocomplete({
-            source: function (request, response) {
-                $.ajax({
-                    url: '@Url.Action("getADGroups", "UserRole")',
-                    type: 'POST',
-                    dataType: 'json',
-                    data: { search: request.term },
-                    success: function (data) {
-                        response($.map(data, function (item) {
-                            return { label: item.value, value: item.value };
-                        }));
-                    }
-                });
-            },
-            select: function (event, ui) {
-                $("searchTerms").val(ui.item.label);
-            }
-        });
-    });
-</script>
-
-<div>
-    @Html.TextBox("searchTerms", null, htmlAttributes: new { placeholder = "Group Name", @class = "form-inline" })
-</div>
-
-        [HttpPost]
-        public ActionResult getADGroups(string search)
-        {
-            PrincipalContext context = new PrincipalContext(ContextType.Domain,System.Web.Configuration.WebConfigurationManager.AppSettings["adAuthURL"].ToString());
-            GroupPrincipal groupPrincipal = new GroupPrincipal(context);
-
-            groupPrincipal.Name = search + "*";
-
-            PrincipalSearcher principalSearch = new PrincipalSearcher(groupPrincipal);
-
-            List<string> results = new List<string>();
-            var result = new List<KeyValuePair<string, string>>();
-
-            int count = 0;
-            var list = new List<JsonResults>();
-
-            foreach (var found in principalSearch.FindAll())
-            {
-                if (count == 5)
-                {
-                    break;
-                }
-                //results.Add(found.Name);
-                //result.Add(new KeyValuePair<string, string>(found.Name, found.Name));
-                list.Add(new JsonResults { id = count.ToString(), label = found.Name, value = found.Name });
-                count += 1;
-            }
-
-            return Json(list, JsonRequestBehavior.AllowGet);
-        }
-    }
-
-    public class JsonResults
-    {
-        public string id { get; set; }
-        public string label { get; set; }
-        public string value { get; set; }
-    }
-         */
-
     }
 }

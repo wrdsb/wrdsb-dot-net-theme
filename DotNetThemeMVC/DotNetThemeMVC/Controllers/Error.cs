@@ -67,7 +67,7 @@ namespace DotNetThemeMVC.Controllers
 
             //Send the exception information to AWS Cloudwatch
             //This requires configuration, see documentation:
-            //LINK coming soon
+            //https://staff.wrdsb.ca/software-development/documentation/dot-net-theme/general-configuration-options/
             try
             {
                 //Set the logging group based on debug/production switch

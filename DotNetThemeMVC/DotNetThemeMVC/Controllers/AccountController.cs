@@ -166,6 +166,21 @@ namespace DotNetThemeMVC.Controllers
             return true;
         }
 
+        /// <summary>
+        /// Checks to see if the user is in the Administrator Role
+        /// </summary>
+        /// <returns>boolean</returns>
+        public bool isAdministrator(string username)
+        {
+            var user = UserManager.FindByName(username);
+
+            if (UserManager.IsInRole(user.Id, "Administrators") || UserManager.IsInRole(user.Id, "SuperAdmin"))
+            {
+                return true;
+            }
+            return false;
+        }
+
         // POST: /Account/Login
         /// <summary>
         /// Authenticates the user against the db.
@@ -205,24 +220,16 @@ namespace DotNetThemeMVC.Controllers
                             bool accountExist = accountExists(model.Email);
 
                             //Is a member, account exists, authorized
-                            //User is a member of authorized active directory groups and has an account in the users table
                             if(isGroupMember && accountExist)
                             {
                                 userIsAuthorized = true;
                             }
-                            //Is a member, account doesnt exist, not authorized
-                            //User is a member of authorized active directory groups but the admin removed the account in the users table
-                            else if(isGroupMember && !accountExist)
-                            {
-                                userIsAuthorized = false;
-                            }
-                            //Is not a member, account exists, authorized
-                            //User is not a member of authorized active directory groups, but the admin added the account in the users table
-                            else if(!isGroupMember && accountExist)
+                            //Administrator accounts may not be in the authorized Active Directory group
+                            //Check if the username  is an administrator
+                            if(isAdministrator(model.Email))
                             {
                                 userIsAuthorized = true;
                             }
-
                         }
 
                         //Authorize the user through IPPS

@@ -4,7 +4,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Edit the AD Groups Permissions</h2>
+<h2>Edit the Active Directory Groups and Roles</h2>
 
 @using (Html.BeginForm())
 {
@@ -12,7 +12,7 @@
     @Html.Partial("_ValidationSummary", ViewData.ModelState)
 
     <fieldset>
-        <legend>ACtive Directory Group Permissions</legend>
+        <legend>Active Directory Group Permissions</legend>
         <div class="col-md-3">
             <div class="form-group">
                 @Html.LabelFor(model => model.groupName, "Active Directory Group Name")

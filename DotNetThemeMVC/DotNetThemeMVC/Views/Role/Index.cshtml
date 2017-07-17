@@ -9,36 +9,29 @@
 <p>
     Manage which Roles are available for administrators to assign to board users.
 </p>
-<br />
-<h2>Add Roles</h2>
-<p>
-    @Html.ActionLink("Add", "Create") a role to the list of roles.
-</p>
-<br />
-<h2>Edit Roles</h2>
-<p>
-    Edit an existing roles: name.<br />
-    Delete a role to remove it from the list.
-</p>
-<table class="table">
-    <tr>
-        <th>
-            Role Name
-        </th>
-        <th></th>
-    </tr>
-
-    @foreach (var item in Model)
-    {
+<div style="padding-top: 50px;">
+    <table class="table">
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { id = item.id }) |
-                @Html.ActionLink("Delete", "Delete", new { id = item.id })
-            </td>
+            <th>
+                Role Name
+            </th>
+            <th>
+                Manage Roles @Html.ActionLink("(+)", "Create", null, htmlAttributes: new { @style = "color:green" })
+            </th>
         </tr>
-    }
 
-</table>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td class="text-center">
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td class="text-center">
+                    @Html.ActionLink("Edit", "Edit", new { id = item.id }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.id })
+                </td>
+            </tr>
+        }
+
+    </table>
+</div>
