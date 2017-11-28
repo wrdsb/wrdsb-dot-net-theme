@@ -18,20 +18,14 @@
                 @Html.DisplayFor(modelItem => role) @:
                 }
         </div>
+        <div class="form-group text-right">
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(model => model.User.Id)
+                @Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-default"})
+                <input type="submit" value="Delete" class="btn btn-default" />
+            }
+        </div>
     </div>
 </fieldset>
-
-
-@using (Html.BeginForm())
-{
-    @Html.AntiForgeryToken()
-    @Html.HiddenFor(model => model.User.Id)
-    <h3>Are you sure you want to delete this?</h3>
-    <div class="form-actions no-color">
-        <input type="submit" value="Delete" class="btn btn-default" />
-    </div>
-}
-<br />
-<div>
-    @Html.ActionLink("Back to List", "Index")
-</div>
