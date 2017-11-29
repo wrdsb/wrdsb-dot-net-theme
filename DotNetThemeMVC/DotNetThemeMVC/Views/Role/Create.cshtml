@@ -21,7 +21,7 @@
                 @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
             </div>
             <div class="form-group text-right">
-                @Html.ActionLink("Cancel", "Index", new { @class = "btn btn-defalut"})
+                @Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-defalut"})
                 <input type="submit" value="Create" class="btn btn-default" />
             </div>
         </div>
