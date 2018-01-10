@@ -37,7 +37,24 @@ namespace DotNetThemeMVC.Controllers
                     //Add custom recipients here
                     //email.SendEmail("_____@wrdsb.on.ca", WebConfigurationManager.AppSettings["loginTitle"].ToString() + " Exception", emailText);
                     //email.SendEmail("_____@googleapps.wrdsb.ca", WebConfigurationManager.AppSettings["loginTitle"].ToString() + " Exception", emailText);
-                    
+
+                    //Add Exception details to the email message text in the same format that is sent to AWS below
+                    //if stack trace is null reference then targetsite also returns null reference
+                    //Get the name of the method that threw the exception
+                    MethodBase site = exception.TargetSite;
+                    string methodName = site == null ? null : site.Name;
+
+                    //Get the  filename and linenumber that threw the exception
+                    var st = new StackTrace(exception, true);
+                    var frame = st.GetFrame(0);
+                    var line = frame.GetFileLineNumber(); 
+                    var filename = frame.GetFileName();
+
+                    //Attach the full error message to the custom one sent in from the controller source
+                    //Current Format is: [FileName:value][MethodName:value][LineNumber:value][RawMessage:value]
+                    var full_error_message = "[Filename:" + filename + "][MethodName:" + methodName + "][LineNumber:" + line + "][RawMessage:" + exception.Message.ToString() + "]";
+                    emailText += full_error_message;
+
                     //Email Super Admins about the exception
                     email.EmailSuperAdmins(WebConfigurationManager.AppSettings["loginTitle"].ToString() + " Exception", emailText);
                 }
