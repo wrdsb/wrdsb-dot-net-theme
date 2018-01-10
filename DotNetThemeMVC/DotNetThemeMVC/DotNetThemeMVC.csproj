@@ -20,6 +20,8 @@
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
+    <Use64BitIISExpress />
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -298,14 +300,6 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Config\ConnectionStrings.config">
-      <SubType>Designer</SubType>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Config\AppSettings.config" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Views\Role\Create.cshtml" />
   </ItemGroup>
   <ItemGroup>
@@ -356,6 +350,9 @@
     <Content Include="Views\ADGroupRoles\Edit.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Config\ConnectionStrings.config" />
+    <Content Include="Config\AppSettings.config" />
+    <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
     <None Include="Properties\PublishProfiles\Test.pubxml" />
     <Content Include="Views\ADGroupRoles\Delete.cshtml" />
   </ItemGroup>
@@ -373,7 +370,7 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
+          <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>56597</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>

@@ -27,8 +27,8 @@
                     @Html.DisplayFor(modelItem => item.Name)
                 </td>
                 <td class="text-center">
-                    @Html.ActionLink("Edit", "Edit", new { id = item.id }) |
-                    @Html.ActionLink("Delete", "Delete", new { id = item.id })
+                    @Html.ActionLink("Edit", "Edit", new { id = item.id }, new { @class = "btn btn-default"}) 
+                    @Html.ActionLink("Delete", "Delete", new { id = item.id }, new { @class = "btn btn-default"})
                 </td>
             </tr>
         }

@@ -70,8 +70,8 @@
                 }
                 </td>
                 <td class="text-center">
-                    @Html.ActionLink("Edit", "Edit", new { id = item.User.Id }) |
-                    @Html.ActionLink("Delete", "Delete", new { id = item.User.Id })
+                    @Html.ActionLink("Edit", "Edit", new { id = item.User.Id }, new { @class = "btn btn-default" })
+                    @Html.ActionLink("Delete", "Delete", new { id = item.User.Id }, new { @class = "btn btn-default"})
                 </td>
             </tr>
         }
