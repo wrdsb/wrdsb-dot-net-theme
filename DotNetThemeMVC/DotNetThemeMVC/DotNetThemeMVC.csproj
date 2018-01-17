@@ -350,8 +350,8 @@
     <Content Include="Views\ADGroupRoles\Edit.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Config\ConnectionStrings.config" />
     <Content Include="Config\AppSettings.config" />
+    <Content Include="Config\ConnectionStrings.config" />
     <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
     <None Include="Properties\PublishProfiles\Test.pubxml" />
     <Content Include="Views\ADGroupRoles\Delete.cshtml" />

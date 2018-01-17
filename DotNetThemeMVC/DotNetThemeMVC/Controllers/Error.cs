@@ -97,9 +97,13 @@ namespace DotNetThemeMVC.Controllers
 
                 //Set the AWS values, log group, log level
                 var config = new LoggingConfiguration();
+
+                //The log group name cannot have spaces, but the loginTitle is meant to be human readable, transform it for format AWS requires
+                var application_name = WebConfigurationManager.AppSettings["loginTitle"].ToString().ToLower().Replace(" ", "_");
+
                 var awsTarget = new AWSTarget()
                 {
-                    LogGroup = "/dotnet/" + WebConfigurationManager.AppSettings["loginTitle"].ToString().ToLower() + "/" + environment,
+                    LogGroup = "/dotnet/" + application_name + "/" + environment,
                     Region = "us-east-1"
                 };
                 config.AddTarget("aws", awsTarget);
