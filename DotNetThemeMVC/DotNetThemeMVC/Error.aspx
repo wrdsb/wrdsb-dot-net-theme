@@ -42,7 +42,6 @@
             <img src="https://s3.amazonaws.com/wrdsb-theme/images/WRDSB_Logo.svg" />
             <h1>That...didn't work.</h1>
         </div>
-        <img src="https://s3.amazonaws.com/wrdsb-theme/images/moss.gif" alt="Error" />
         <div id="loginform">
         <p>Here's what you can do</p>
         <ul>
