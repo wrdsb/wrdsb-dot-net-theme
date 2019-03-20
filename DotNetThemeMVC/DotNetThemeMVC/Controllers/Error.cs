@@ -88,6 +88,8 @@ namespace DotNetThemeMVC.Controllers
                 log.WriteEntry(errorMessage, System.Diagnostics.EventLogEntryType.Error);
             }
 
+            //You can now log the error to Azure or AWS or even both.
+
             //Send the exception information to AWS Cloudwatch
             //This requires configuration, see documentation:
             //https://staff.wrdsb.ca/software-development/documentation/dot-net-theme/general-configuration-options/
@@ -152,7 +154,7 @@ namespace DotNetThemeMVC.Controllers
 
             //Send the exception information to Azure Log Analytics
             //This requires configuration, see documentation:
-            //https://docs.microsoft.com/en-us/azure/azure-monitor/platform/data-collector-api
+            //https://staff.wrdsb.ca/software-development/documentation/dot-net-theme/general-configuration-options/
             string result = string.Empty;
             try
             {
@@ -164,9 +166,9 @@ namespace DotNetThemeMVC.Controllers
 #else
                 string environment = "production";
 #endif
-                var application_name = WebConfigurationManager.AppSettings["loginTitle"].ToString().ToLower().Replace(" ", "_");
+                var application_name = WebConfigurationManager.AppSettings["loginTitle"].ToString().ToLower().Replace(" ", "");
 
-                string log_name = "/dotnet/" + application_name + "/" + environment;
+                string log_name = "dotnet" + application_name + environment;
 
                 string timestamp = DateTime.Now.ToString();
 
