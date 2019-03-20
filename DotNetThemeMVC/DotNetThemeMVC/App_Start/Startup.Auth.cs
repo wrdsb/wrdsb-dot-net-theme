@@ -6,6 +6,8 @@ using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Google;
 using Owin;
 using DotNetThemeMVC.Models;
+using Microsoft.Owin.Security.OpenIdConnect;
+using Microsoft.Owin.Security;
 
 namespace DotNetThemeMVC
 {
@@ -63,6 +65,17 @@ namespace DotNetThemeMVC
             //    ClientId = "",
             //    ClientSecret = ""
             //});
+
+            //Azure AD
+            //app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
+            //app.UseCookieAuthentication(new CookieAuthenticationOptions());
+            //app.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions
+            //{
+            //    ClientId = "",
+            //    Authority = ""
+            //});
+
+            //ConfigureAuth(app);
         }
     }
 }
