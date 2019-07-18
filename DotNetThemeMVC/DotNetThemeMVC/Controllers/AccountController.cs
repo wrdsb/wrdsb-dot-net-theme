@@ -66,32 +66,6 @@ namespace DotNetThemeMVC.Controllers
             ViewBag.ReturnUrl = returnUrl;
             return View();
         }
-        
-        /// <summary>
-        /// Authenticates a user against active directory.
-        /// </summary>
-        /// <param name="username">The input value for username</param>
-        /// <param name="password">The input value for password</param>
-        /// <returns>boolean</returns>
-        public bool AuthenticateAD(string username, string password)
-        {
-            using (var context = new PrincipalContext(ContextType.Domain, System.Web.Configuration.WebConfigurationManager.AppSettings["adAuthURL"].ToString(), username, password))
-            {
-                return context.ValidateCredentials(username, password);
-            }
-        }
-
-        /// <summary>
-        /// Returns the administrators email address from AD
-        /// </summary>
-        /// <param name="username">The input value for username</param>
-        /// <returns>string</returns>
-        public string GetADEmail(string username)
-        {
-            PrincipalContext context = new PrincipalContext(ContextType.Domain, System.Web.Configuration.WebConfigurationManager.AppSettings["adAuthURL"].ToString());
-            UserPrincipal user = UserPrincipal.FindByIdentity(context, username);
-            return user.EmailAddress;
-        }
 
         ///This section is a work in progress, change to function being called from Login()
         /// <summary>
@@ -112,13 +86,13 @@ namespace DotNetThemeMVC.Controllers
                 //Get the list of approved Groups
                 List<string> approvedGroups = db.ad_group_roles.Select(z => z.group_name).Distinct().ToList();
 
-                PrincipalContext context = new PrincipalContext(ContextType.Domain, System.Web.Configuration.WebConfigurationManager.AppSettings["adAuthURL"].ToString());
-                UserPrincipal user = UserPrincipal.FindByIdentity(context, username);
+                ADProviderController ad = new ADProviderController();
+                UserPrincipal user = ad.GetUserPrincipal(username);
 
                 //Find out if the supplied username belongs to any Active Directory Group that has been authorized
                 foreach (var approvedGroup in approvedGroups)
                 {
-                    GroupPrincipal group = GroupPrincipal.FindByIdentity(context, approvedGroup);
+                    GroupPrincipal group = ad.GetGroupPrincipal(approvedGroup);
                     if (user != null && group != null)
                     {
                         if (user.IsMemberOf(group))
@@ -156,12 +130,14 @@ namespace DotNetThemeMVC.Controllers
         /// <param name="username">The input value for username</param>
         public bool createAccount(string username)
         {
-            string email = GetADEmail(username);
+            ADProviderController ad = new ADProviderController();
+
+            string email = ad.GetUserEmail(username);
             if(String.IsNullOrEmpty(email))
             {
                 return false;
             }
-            var user = new ApplicationUser { UserName = username, Email = GetADEmail(username), EmailConfirmed = true };
+            var user = new ApplicationUser { UserName = username, Email = email, EmailConfirmed = true };
             UserManager.Create(user);
             return true;
         }
@@ -203,8 +179,9 @@ namespace DotNetThemeMVC.Controllers
                 // To enable password failures to trigger account lockout, change to shouldLockout: true
                 if (!model.Email.Contains("@"))
                 {
+                    ADProviderController ad = new ADProviderController();
                     //Authenticate against AD
-                    if (AuthenticateAD(model.Email, model.Password))
+                    if (ad.Authenticate(model.Email, model.Password))
                     {
                         //User has authenticated
                         //Check which Authorization method is enabled

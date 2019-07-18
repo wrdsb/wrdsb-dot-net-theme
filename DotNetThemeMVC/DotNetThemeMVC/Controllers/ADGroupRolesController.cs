@@ -81,78 +81,18 @@ namespace DotNetThemeMVC.Controllers
         }
 
         /// <summary>
-        /// Returns the users email address from Active Directory
-        /// </summary>
-        /// <param name="username">The input value for username</param>
-        /// <returns>string</returns>
-        public string GetADEmail(string username)
-        {
-            PrincipalContext context = new PrincipalContext(ContextType.Domain, WebConfigurationManager.AppSettings["adAuthURL"].ToString());
-            UserPrincipal user = UserPrincipal.FindByIdentity(context, username);
-            return user.EmailAddress;
-        }
-
-        /// <summary>
         /// Creates an account for the supplied username
         /// </summary>
         /// <param name="username">The input value for username</param>
         public void CreateAccount(string username)
         {
-            string email = GetADEmail(username);
+            ADProviderController ad = new ADProviderController();
+            string email = ad.GetUserEmail(username);
             if (!String.IsNullOrEmpty(email))
             {
-                var user = new ApplicationUser { UserName = username, Email = GetADEmail(username), EmailConfirmed = true };
+                var user = new ApplicationUser { UserName = username, Email = email, EmailConfirmed = true };
                 UserManager.Create(user);
             }
-        }
-
-        /// <summary>
-        /// Gets a list of PAL usernames that belong to an Active Directory group name
-        /// </summary>
-        /// <param name="adGroupName">The input value for active directory group name</param>
-        /// <returns>List<string></returns>
-        public List<string> GetADAccounts(string adGroupName)
-        {
-            List<string> accounts = new List<string>();
-
-            PrincipalContext ctx = new PrincipalContext(ContextType.Domain, WebConfigurationManager.AppSettings["adAuthURL"].ToString());
-            GroupPrincipal group = GroupPrincipal.FindByIdentity(ctx, adGroupName);
-
-            if (group != null)
-            {
-                foreach (Principal p in group.GetMembers())
-                {
-                    //Make sure p is a user and not a group within a group
-                    if (p != null && p is UserPrincipal)
-                    {
-                        //Filter out non character names as well
-                        if (p.SamAccountName.All(Char.IsLetter))
-                        {
-                            accounts.Add(p.SamAccountName.ToLower());
-                        }
-                    }
-                }
-            }
-            return accounts;
-        }
-
-        /// <summary>
-        /// Checks to see if a username is a member of a Active Directory gruop
-        /// </summary>
-        /// <param name="account">The input value for username</param>
-        /// <param name="adGroup">The input value for active directory group name</param>
-        /// <returns>boolean</returns>
-        public bool IsMemberOfADGroup(string account, string adGroup)
-        {
-            PrincipalContext context = new PrincipalContext(ContextType.Domain, WebConfigurationManager.AppSettings["adAuthURL"].ToString());
-            UserPrincipal user = UserPrincipal.FindByIdentity(context, account);
-            GroupPrincipal group = GroupPrincipal.FindByIdentity(context, adGroup);
-
-            if (user.IsMemberOf(group))
-            {
-                return true;
-            }
-            return false;
         }
 
         /// <summary>
@@ -164,21 +104,20 @@ namespace DotNetThemeMVC.Controllers
         /// <returns>boolean</returns>
         public bool IsPermissionedByGroupToEdit(string account, string removedRole, string groupName)
         {
-            //List<string> adGroupNames = db.ad_group_roles.Select(x => x.group_name).Distinct().ToList();
-            //foreach (var adGroupName in adGroupNames)
-            //{
-                if (IsMemberOfADGroup(account, groupName))
+            ADProviderController ad = new ADProviderController();
+
+            if (ad.UserIsMemberOfGroup(account, groupName))
+            {
+                List<string> roles = db.ad_group_roles.Where(x => x.group_name == groupName).Select(x => x.role_name).ToList();
+                foreach (var role in roles)
                 {
-                    List<string> roles = db.ad_group_roles.Where(x => x.group_name == groupName).Select(x => x.role_name).ToList();
-                    foreach (var role in roles)
+                    if (role.Equals(removedRole))
                     {
-                        if (role.Equals(removedRole))
-                        {
-                            return true;
-                        }
+                        return true;
                     }
                 }
-            //}
+            }
+
             return false;
         }
 
@@ -193,9 +132,12 @@ namespace DotNetThemeMVC.Controllers
         {
             List<string> adGroupNames = db.ad_group_roles.Select(x => x.group_name).Distinct().ToList();
             adGroupNames.Remove(excludeGroup);
+
+            ADProviderController ad = new ADProviderController();
+
             foreach (var adGroupName in adGroupNames)
             {
-                if (IsMemberOfADGroup(account, adGroupName))
+                if (ad.UserIsMemberOfGroup(account, adGroupName))
                 {
                     List<string> roles = db.ad_group_roles.Where(x => x.group_name == adGroupName).Select(x => x.role_name).ToList();
                     foreach (var role in roles)
@@ -273,7 +215,8 @@ namespace DotNetThemeMVC.Controllers
                     }
 
                     //Get a list of all the accounts that belong to the AD Group Name
-                    List<string> accounts = GetADAccounts(adGroupRolesViewModel.groupName);
+                    ADProviderController ad = new ADProviderController();
+                    List<string> accounts = ad.GetGroupMembers(adGroupRolesViewModel.groupName);
                     if (accounts == null)
                     {
                         ModelState.AddModelError(adGroupRolesViewModel.groupName, "Failed to retrieve users belonging to the AD Group.");
@@ -315,10 +258,10 @@ namespace DotNetThemeMVC.Controllers
                         //For all the selected roles, save a record to the ad_group_roles table
                         foreach (var role in adGroupRolesViewModel.groupRoles)
                         {
-                            ad_group_roles ad = new ad_group_roles();
-                            ad.group_name = adGroupRolesViewModel.groupName;
-                            ad.role_name = role;
-                            db.ad_group_roles.Add(ad);
+                            ad_group_roles ad_group_role = new ad_group_roles();
+                            ad_group_role.group_name = adGroupRolesViewModel.groupName;
+                            ad_group_role.role_name = role;
+                            db.ad_group_roles.Add(ad_group_role);
                         }
                         db.SaveChanges();
                     }
@@ -398,7 +341,8 @@ namespace DotNetThemeMVC.Controllers
                     if (!adGroupRolesViewModel.groupRoles.SequenceEqual(adGroupRoles))
                     {
                         //Get a list of all the accounts that belong to the selected AD Group Name
-                        List<string> accounts = GetADAccounts(adGroupRolesViewModel.groupName);
+                        ADProviderController ad = new ADProviderController();
+                        List<string> accounts = ad.GetGroupMembers(adGroupRolesViewModel.groupName);
                         if (accounts == null)
                         {
                             ModelState.AddModelError(adGroupRolesViewModel.groupName, "Failed to retrieve users belonging to the AD Group.");
@@ -465,10 +409,10 @@ namespace DotNetThemeMVC.Controllers
                         //For all the new roles, add a record to the ad_group_roles table
                         foreach (var role in newRoles)
                         {
-                            ad_group_roles ad = new ad_group_roles();
-                            ad.group_name = adGroupRolesViewModel.groupName;
-                            ad.role_name = role;
-                            db.ad_group_roles.Add(ad);
+                            ad_group_roles ad_group_role = new ad_group_roles();
+                            ad_group_role.group_name = adGroupRolesViewModel.groupName;
+                            ad_group_role.role_name = role;
+                            db.ad_group_roles.Add(ad_group_role);
                         }
                         db.SaveChanges();
 
@@ -537,7 +481,8 @@ namespace DotNetThemeMVC.Controllers
                 adGroupRolesViewModel.groupName = id;
                 adGroupRolesViewModel.groupRoles = db.ad_group_roles.Where(x => x.group_name == id).Select(z => z.role_name).ToList();
                 //Get a list of all the accounts that belong to the selected AD Group Name
-                List<string> accounts = GetADAccounts(adGroupRolesViewModel.groupName);
+                ADProviderController ad = new ADProviderController();
+                List<string> accounts = ad.GetGroupMembers(adGroupRolesViewModel.groupName);
                 if (accounts == null)
                 {
                     ModelState.AddModelError(id, "Failed to retrieve users belonging to the AD Group.");
@@ -618,8 +563,8 @@ namespace DotNetThemeMVC.Controllers
         [HttpPost]
         public ActionResult getADGroups(string search)
         {
-            PrincipalContext context = new PrincipalContext(ContextType.Domain,System.Web.Configuration.WebConfigurationManager.AppSettings["adAuthURL"].ToString());
-            GroupPrincipal groupPrincipal = new GroupPrincipal(context);
+            ADProviderController ad = new ADProviderController();
+            GroupPrincipal groupPrincipal = new GroupPrincipal(ad.GetDomainContext());
 
             groupPrincipal.Name = search + "*";
 
