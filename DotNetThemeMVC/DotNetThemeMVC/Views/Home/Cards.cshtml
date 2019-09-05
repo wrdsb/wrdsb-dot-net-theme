@@ -1,0 +1,44 @@
+﻿
+@{
+    ViewBag.Title = "Cards";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h2>Cards</h2>
+
+@Styles.Render("https://wrdsb-ui-assets.s3.amazonaws.com/intranet/master.css")
+
+<div class="wrdsb_card">
+    <a href="@Url.Action("BeaverCreek", "Map")">
+        <div class="wrdsb_card_details">
+            <div class="wrdsb_card_title">
+                <h2>Beaver Creek</h2>
+                <p>Map Site</p>
+            </div>
+            <div class="wrdsb_card_image">
+                <p><img src="~/Images/Beaver_Creek.jpg" alt="" /></p>
+            </div>
+            <div class="wrdsb_card_description">
+                <p>Beaver Creek, also known as War Games Map_Set/: 250-5[1] is a multiplayer map in Halo 2. It is set in a tiny canyon featuring two symmetrical bases that are separated by a small creek.</p>
+            </div>
+        </div>
+    </a>
+    <div class="wrdsb_card_actions"><a class="wrdsb_card_main_action" href="@Url.Action("BeaverCreek", "City")">Visit<span class="sr-only">Accessibility text for the link would go here.</span></a></div>
+</div>
+
+<div class="wrdsb_card">
+    <a href="@Url.Action("Lockout", "Map")">
+        <div class="wrdsb_card_details">
+            <div class="wrdsb_card_title">
+                <h2>Lockout</h2>
+                <p>Map site</p>
+            </div>
+            <div class="wrdsb_card_image">
+                <p><img src="~/Images/Lockout.jpg"  alt=""/></p>
+            </div>
+            <div class="wrdsb_card_description">
+                <p>Lockout, also known as War Games Map_Set/: 036-8[1] is a Halo 2 multiplayer level set on an old research laboratory designed by the Forerunners in the icy mountains of Delta Halo.</p>
+            </div>
+        </div>
+    </a>
+    <div class="wrdsb_card_actions"><a class="wrdsb_card_main_action" href="@Url.Action("Lockout", "Map")">Visit<span class="sr-only"> Accessibility text for the link would go here.</span></a> <a class="wrdsb_card_secondary_action" href="@Url.Action("Lockout", "Map")">Find Games<span class="sr-only"> Accessibility text for the link would go here.</span></a></div>
+</div>

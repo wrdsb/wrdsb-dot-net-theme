@@ -6,14 +6,16 @@ using System.Web.Mvc;
 
 namespace DotNetThemeMVC.Controllers
 {
-    public class HomeController : Controller
+    public class MapController : Controller
     {
-        public ActionResult Index()
+        // GET: Map
+
+        public ActionResult BeaverCreek()
         {
             return View();
         }
 
-        public ActionResult Cards()
+        public ActionResult Lockout()
         {
             return View();
         }
