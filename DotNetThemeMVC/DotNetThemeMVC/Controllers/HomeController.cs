@@ -17,5 +17,15 @@ namespace DotNetThemeMVC.Controllers
         {
             return View();
         }
+
+        public ActionResult Internal()
+        {
+            return View();
+        }
+
+        public ActionResult External()
+        {
+            return View();
+        }
     }
 }

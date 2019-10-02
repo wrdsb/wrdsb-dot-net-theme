@@ -1,0 +1,17 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    @Html.Partial("_Header_Internal")
+
+    <title>WRDSB</title>
+
+</head>
+<body>
+    <div class="container">
+        @RenderBody()
+    </div>
+    @Html.Partial("_Footer_Internal")
+</body>
+
+</html>
+@RenderSection("scripts", required: false)

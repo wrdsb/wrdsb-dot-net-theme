@@ -376,6 +376,14 @@
     <Content Include="Views\Home\Cards.cshtml" />
     <Content Include="Views\Map\BeaverCreek.cshtml" />
     <Content Include="Views\Map\Lockout.cshtml" />
+    <Content Include="Views\Shared\_Layout_External.cshtml" />
+    <Content Include="Views\Shared\_Layout_Internal.cshtml" />
+    <Content Include="Views\Shared\_Footer_External.cshtml" />
+    <Content Include="Views\Shared\_Footer_Internal.cshtml" />
+    <Content Include="Views\Shared\_Header_Internal.cshtml" />
+    <Content Include="Views\Shared\_Header_External.cshtml" />
+    <Content Include="Views\Home\Internal.cshtml" />
+    <Content Include="Views\Home\External.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

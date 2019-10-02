@@ -9,6 +9,8 @@ ConnectionStrings.config
 AppSettings.config
 ApplicationInsights.config
 .vs/*
+.vs/
+DotNetThemeWebForms/.vs/
 
 # Build results
 
