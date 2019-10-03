@@ -1,6 +1,85 @@
 ﻿<title>@System.Web.Configuration.WebConfigurationManager.AppSettings["title"].ToString()</title>
 
-<!--<link href="https://s3.amazonaws.com/wrdsb-ui-assets/intranet/2/css/style.css" rel="stylesheet" media="all" />-->
-
-
 <link href="https://s3.amazonaws.com/wrdsb-ui-assets/intranet/master.css" rel="stylesheet" />
+
+<div id="site-wide-navigation">
+
+    <!-- persistent global navigation -->
+
+    <div id="persistent-nav">
+        <div class="mainlinks">
+            <ul>
+                <!--
+                <li><a class="main" href="/">main</a></li>
+                <li><a href="/sites/departments/">departments</a></li>
+                <li><a href="/sites/guides/">guides</a></li>
+                <li><a href="/sites/workspaces/">workspaces</a></li>
+                <li><a href="/sites/school-handbooks/">school handbooks</a></li>
+                -->
+            </ul>
+        </div>
+        <div class="adminlinks">
+            <ul>
+                <!--
+                <li><a href="https://staff-dev.wrdsb.io/wp-admin/">dashboard</a></li>
+                <li><a href="https://staff-dev.wrdsb.io/wp-admin/profile.php">settings</a></li>-->
+                <li>
+                    @if (!User.IsInRole("Administrators"))
+                    {
+                        @Html.ActionLink("Account Settings", "Index", "Manage")
+                    }
+                </li>
+                <li>@Html.ActionLink("Log off", "LogOff", "Account")</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- contextual navigation -->
+
+
+</div>
+<div class="container-top">
+    <div id="masthead">
+        <div class="header">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-9 col-sm-8">
+                        <div id="site_details" role="heading">
+                            <p id="sitename"><span>WRDSB</span><br>@System.Web.Configuration.WebConfigurationManager.AppSettings["title"].ToString()</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-4">
+                        <div class="staff-shortcuts" role="complementary" aria-labelledby="staff-shortcut-list">
+                            
+                            <div class="searchbox" role="search" aria-labelledby="search">
+                                <!--
+                                <form action="https://staff-dev.wrdsb.io/" method="get">
+                                    <input aria-label="Search" type="text" name="s" id="search" value="" placeholder="Search">
+                                </form>-->
+                            </div>
+                            <div id="staff-shortcut-list">
+                                <a href="https://gmail.google.com/" target="_blank" rel="noopener"><img src="https://wrdsb-ui-assets.s3.amazonaws.com/1/1.1.0/images/gmail.svg"></a><a href="https://drive.google.com/" target="_blank" rel="noopener"><img src="https://wrdsb-ui-assets.s3.amazonaws.com/1/1.1.0/images/drive.svg"></a><a href="https://calendar.google.com/" target="_blank" rel="noopener"><img src="https://wrdsb-ui-assets.s3.amazonaws.com/1/1.1.0/images/calendar.svg"></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> <!-- /.masthead -->
+    <div class="navbar my-navbar" role="navigation" aria-labelledby="navbar-header">
+
+        <div id="menu" class="container" role="navigation" aria_label="Menu">
+            <div class="collapse navbar-collapse">
+                <ul id="menu-top-menu" class="nav nav-justified">
+                    <li id="home_link" class="menu-item current-menu-item current_page_item menu-item-home"><a title="Take me to the home page" href="@Url.Action("Index", "Home")">Home</a></li>
+                    <li id="external_link" class="menu-item current-menu-item current_page_item menu-item-home"><a title="Take me to the external page" href="@Url.Action("External", "Home")">External</a></li>
+                    <li id="internal_link" class="menu-item current-menu-item current_page_item menu-item-home"><a title="Take me to the internal page" href="@Url.Action("Internal", "Home")">Internal</a></li>
+                    @if (User.IsInRole("Administrators") || User.IsInRole("SuperAdmin"))
+                    {
+                        <li id="admin_link" class="menu-item menu-item-type-post_type menu-item-object-page"><a title="Take me to the admin page" href="@Url.Action("Home", "Administrator")">Administrators</a></li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div> <!-- /.navbar -->
+</div>

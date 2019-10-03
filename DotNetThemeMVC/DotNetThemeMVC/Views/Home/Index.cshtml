@@ -2,6 +2,8 @@
     ViewBag.Title = "Home Page";
 }
 
-<a href="~/Views/Home/Cards.cshtml">Cards</a>
-<a href="~/Views/Home/External.cshtml">External</a>
-<a href="~/Views/Home/Internal.cshtml">Internal</a>
+
+@Html.ActionLink("Home", "Index", "Home")
+@Html.ActionLink("Cards", "Cards", "Home")
+@Html.ActionLink("External", "External", "Home")
+@Html.ActionLink("Internal", "Internal", "Home")

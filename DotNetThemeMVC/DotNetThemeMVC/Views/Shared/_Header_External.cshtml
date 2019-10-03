@@ -1,17 +1,67 @@
-﻿
-@{
-    Layout = null;
-}
+﻿<title>@System.Web.Configuration.WebConfigurationManager.AppSettings["title"].ToString()</title>
 
-<!DOCTYPE html>
+<link href="https://s3.amazonaws.com/wrdsb-ui-assets/public/master.css" rel="stylesheet"/>
 
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>_Header_External</title>
-</head>
-<body>
-    <div> 
+<div id="masthead">
+    <div class="container-top">
+        <div class="header">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-9 col-sm-8">
+                        <div id="logo" role="heading">
+                            <a aria-labelledby="logo" href="@System.Web.Configuration.WebConfigurationManager.AppSettings["appurl"].ToString()">
+                                <span>Waterloo Region District School Board</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-4">
+                        <div class="staff-shortcuts" role="complementary" aria-labelledby="staff-shortcut-list">
+                            <div class="searchbox" role="search" aria-labelledby="search">
+                                <!--
+                                <form action="https://wwwwrdsbdev.wpengine.com/" method="get">
+                                    <input aria-label="Search" type="text" name="s" id="search" value="" placeholder="Search">
+                                </form>-->
+                            </div>
+
+                            <div id="staff-shortcut-list">
+                                <a href="#address">Contact Information</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</body>
-</html>
+    <div class="navbar my-navbar" role="navigation" aria-labelledby="navbar-header">
+        <div id="navbar-header">
+            <!--
+            <button type="button" class="navbar-toggle togglesearch" data-toggle="collapse" data-target=".navbar-search">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-search"><img src="https://wrdsb-ui-assets.s3.amazonaws.com/public/2/2.0.0/images/search.gif" style="width: 25px; height: 25px;"></span>
+            </button>-->
+            <button type="button" class="navbar-toggle togglenav" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="https://wwwwrdsbdev.wpengine.com/"> Waterloo Region<br> District School Board</a>
+        </div>
+
+        <div class="collapse navbar-search" role="search" aria-labelledby="mobileSearch">
+            <!--
+            <form action="https://wwwwrdsbdev.wpengine.com/" method="get">
+                <input aria-label="Search" type="text" name="s" id="mobileSearch" value="" placeholder="Search">
+            </form>-->
+        </div>
+        <div id="menu" class="container" role="navigation" aria_label="Menu">
+            <div class="collapse navbar-collapse">
+                <ul id="menu-top-menu" class="nav nav-justified">
+                    <li id="home_link" class="menu-item current-menu-item current_page_item menu-item-home"><a title="Take me to the home page" href="@Url.Action("Index", "Home")">Home</a></li>
+                    <li id="external_link" class="menu-item current-menu-item current_page_item menu-item-home"><a title="Take me to the external page" href="@Url.Action("External", "Home")">External</a></li>
+                    <li id="internal_link" class="menu-item current-menu-item current_page_item menu-item-home"><a title="Take me to the internal page" href="@Url.Action("Internal", "Home")">Internal</a></li>
+                </ul>
+            </div>
+        </div>
+    </div><!-- /.navbar -->
+</div>
