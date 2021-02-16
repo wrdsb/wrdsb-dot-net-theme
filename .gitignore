@@ -8,7 +8,7 @@
 ConnectionStrings.config
 AppSettings.config
 ApplicationInsights.config
-.vs/*
+.vs
 
 # Build results
 

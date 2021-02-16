@@ -10,6 +10,7 @@ using DotNetThemeMVC.Models;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using System.Net;
 
 namespace DotNetThemeMVC.Controllers
 {
@@ -45,6 +46,7 @@ namespace DotNetThemeMVC.Controllers
 
                 //For more information on configuring this code see the c# api documentation
                 //https://documentation.mailgun.com/api-sending.html#examples
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                 RestClient client = new RestClient();
                 client.BaseUrl = new Uri("https://api.mailgun.net/v3");
                 client.Authenticator = new HttpBasicAuthenticator("api", System.Web.Configuration.WebConfigurationManager.AppSettings["mailgunKey"].ToString());
